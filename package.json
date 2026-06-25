@@ -1,0 +1,16 @@
+{
+  "name": "foodrecipe-wrapper",
+  "version": "1.0.0",
+  "description": "Wrapper for FoodRecipe API and Frontend",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix Frontend --legacy-peer-deps",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
+    "start:api": "dotnet run --project API --launch-profile http",
+    "start:frontend": "npm start --prefix Frontend",
+    "dev": "concurrently -n \"db,api,frontend\" -c \"blue,green,magenta\" \"npm run db:up\" \"npm run start:api\" \"npm run start:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
