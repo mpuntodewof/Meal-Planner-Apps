@@ -45,7 +45,16 @@ const recipeApi = createApi({
       }),
       invalidatesTags: ["Recipes"],
     }),
-    
+    generateRecipe: builder.mutation({
+      query: (body) => ({
+        url: "recipe/generate",
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body,
+      }),
+    }),
 
   }),
 });
@@ -55,6 +64,7 @@ export const {
   useGetRecipeByIdQuery,
   useCreateRecipeMutation,
   useUpdateRecipeMutation,
-  useDeleteRecipeMutation,  
+  useDeleteRecipeMutation,
+  useGenerateRecipeMutation,
 } = recipeApi;
 export default recipeApi;
