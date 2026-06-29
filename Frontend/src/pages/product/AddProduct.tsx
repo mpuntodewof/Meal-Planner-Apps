@@ -192,7 +192,7 @@ export default function AddProduct() {
         serviceSize: r.serviceSize ?? "",
       }));
       setIngredientData(
-        (r.ingredient ?? []).map((ing: any, i: number) => ({
+        ((r.ingredient?.$values ?? r.ingredient) ?? []).map((ing: any, i: number) => ({
           name: ing.name ?? "",
           unit: ing.unit ?? "",
           description: ing.description ?? "",
@@ -200,7 +200,7 @@ export default function AddProduct() {
         }))
       );
       setInstructionData(
-        (r.instructions ?? []).map((ins: any, i: number) => ({
+        ((r.instructions?.$values ?? r.instructions) ?? []).map((ins: any, i: number) => ({
           stepNumber: ins.stepNumber ?? i + 1,
           description: ins.description ?? "",
           id: i,
