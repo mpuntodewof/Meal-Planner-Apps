@@ -77,6 +77,12 @@ namespace FoodFestAPI.Helpers
                     raw,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
+                if (result == null || string.IsNullOrWhiteSpace(result.Name))
+                {
+                    _log.LogWarning("Recipe generation returned an empty or malformed result.");
+                    return null;
+                }
+
                 return result;
             }
             catch (Exception ex)
