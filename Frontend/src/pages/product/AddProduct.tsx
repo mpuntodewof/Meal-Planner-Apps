@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Navbar } from '../../components/sub-comp';
 import Footer from '../../components/Footer';
 import toastNotify from '../../helper/toastNotify';
-import { useCreateRecipeMutation, useGetRecipeByIdQuery, useGetRecipesQuery, useUpdateRecipeMutation } from '../../api/recipeApi';
+import { useCreateRecipeMutation, useGetRecipeByIdQuery, useGetRecipesQuery, useUpdateRecipeMutation, useGenerateRecipeMutation } from '../../api/recipeApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import inputHelper from '../../helper/inputHelper';
 import "rsuite/dist/rsuite.min.css";
@@ -51,6 +51,9 @@ export default function AddProduct() {
   const { data } = useGetRecipeByIdQuery(id);
   const [updateRecipe] = useUpdateRecipeMutation();
   const [createRecipe] = useCreateRecipeMutation();
+  const [generateRecipe] = useGenerateRecipeMutation();
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
   const [recipeInputs, setRecipeInputs] = useState(recipeData);
   const navigate = useNavigate();
 
@@ -168,6 +171,49 @@ export default function AddProduct() {
     setIngredientData(array);
   }
 
+  const handleGenerate = async () => {
+    if (!aiPrompt.trim()) {
+      toastNotify("Please describe the recipe you want.", "error");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const response: any = await generateRecipe({ prompt: aiPrompt }).unwrap();
+      const r = response?.result;
+      if (!r) {
+        toastNotify("Couldn't generate a recipe. Please try again.", "error");
+        return;
+      }
+      setRecipeInputs(curr => ({
+        ...curr,
+        name: r.name ?? "",
+        description: r.description ?? "",
+        cookingTime: r.cookingTime ?? "",
+        serviceSize: r.serviceSize ?? "",
+      }));
+      setIngredientData(
+        (r.ingredient ?? []).map((ing: any, i: number) => ({
+          name: ing.name ?? "",
+          unit: ing.unit ?? "",
+          description: ing.description ?? "",
+          id: i,
+        }))
+      );
+      setInstructionData(
+        (r.instructions ?? []).map((ins: any, i: number) => ({
+          stepNumber: ins.stepNumber ?? i + 1,
+          description: ins.description ?? "",
+          id: i,
+        }))
+      );
+      toastNotify("Recipe generated — review and save.", "success");
+    } catch (err) {
+      toastNotify("Couldn't generate a recipe. Please try again.", "error");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handleSubmit = async (
     e: any
   ) => {
@@ -254,6 +300,28 @@ export default function AddProduct() {
           </div>
         </div>
       </div>
+
+        <div className="container" style={{ marginTop: 24 }}>
+          <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 20, marginBottom: 24, background: "#fafafa" }}>
+            <h4 style={{ fontWeight: 700 }}>✨ Generate with AI</h4>
+            <p style={{ color: "#666", margin: "6px 0 12px" }}>
+              Describe a dish and let AI draft the recipe. You can edit everything before saving.
+            </p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <input
+                className="form-control"
+                style={{ flex: "1 1 320px" }}
+                placeholder='e.g. "spicy vegan ramen, 30 min, serves 2"'
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                disabled={aiLoading}
+              />
+              <button type="button" className="btn btn-warning" onClick={handleGenerate} disabled={aiLoading}>
+                {aiLoading ? "Generating…" : "Generate"}
+              </button>
+            </div>
+          </div>
+        </div>
 
       {/* Recipe Form Section */}
       <div className="checkout-section mt-150 mb-150">
