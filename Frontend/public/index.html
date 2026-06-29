@@ -16,9 +16,15 @@
     <!-- CSS -->
     <!-- favicon -->
     <link rel="shortcut icon" type="image/png" href="./assets/img/favicon.png">
-    <!-- google font -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+    <!-- google font: preconnect + non-blocking load (print->all swap) so fonts don't block first paint -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+    </noscript>
     <!-- fontawesome -->
     <link rel="stylesheet" href="%PUBLIC_URL%/assets/css/all.min.css">
     <!-- bootstrap -->
@@ -43,26 +49,28 @@
     <div id="root"></div>
     
     <!-- Landing Page  -->
+    <!-- Legacy jQuery theme plugins: `defer` so they download in parallel and -->
+    <!-- run after the DOM is ready (preserving load order) instead of blocking first paint. -->
     <!-- jquery -->
-    <script src="%PUBLIC_URL%/assets/js/jquery-1.11.3.min.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/jquery-1.11.3.min.js"></script>
     <!-- bootstrap -->
-    <script src="%PUBLIC_URL%/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/bootstrap/js/bootstrap.min.js"></script>
     <!-- count down -->
-    <script src="%PUBLIC_URL%/assets/js/jquery.countdown.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/jquery.countdown.js"></script>
     <!-- isotope -->
-    <script src="%PUBLIC_URL%/assets/js/jquery.isotope-3.0.6.min.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/jquery.isotope-3.0.6.min.js"></script>
     <!-- waypoints -->
-    <script src="%PUBLIC_URL%/assets/js/waypoints.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/waypoints.js"></script>
     <!-- owl carousel -->
-    <script src="%PUBLIC_URL%/assets/js/owl.carousel.min.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/owl.carousel.min.js"></script>
     <!-- magnific popup -->
-    <script src="%PUBLIC_URL%/assets/js/jquery.magnific-popup.min.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/jquery.magnific-popup.min.js"></script>
     <!-- mean menu -->
-    <script src="%PUBLIC_URL%/assets/js/jquery.meanmenu.min.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/jquery.meanmenu.min.js"></script>
     <!-- sticker js -->
-    <script src="%PUBLIC_URL%/assets/js/sticker.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/sticker.js"></script>
     <!-- main js -->
-    <script src="%PUBLIC_URL%/assets/js/main.js"></script>
+    <script defer src="%PUBLIC_URL%/assets/js/main.js"></script>
     <!-- End Landing Page -->
      
   </body>
