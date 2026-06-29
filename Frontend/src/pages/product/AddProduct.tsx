@@ -238,7 +238,7 @@ export default function AddProduct() {
       id: item.id,
       name: item.name,
       description: item.description,
-      unit: item.unimmm,
+      unit: item.unit,
     }));
 
     const payload = {
