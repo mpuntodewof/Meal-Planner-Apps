@@ -1,8 +1,7 @@
+using System.Text;
 using System.Text.Json;
-using Anthropic;
-using Anthropic.Core;
-using Anthropic.Models.Messages;
 using FoodFestAPI.Models.DTO;
+using OpenAI.Chat;
 
 namespace FoodFestAPI.Helpers
 {
@@ -17,6 +16,8 @@ namespace FoodFestAPI.Helpers
             _log = log;
         }
 
+        private const string Model = "gpt-4o-mini";
+
         private const string SystemPrompt =
             "You are a recipe author. Given the user's request, produce exactly one complete, " +
             "realistic recipe. Respond with ONLY a JSON object (no markdown, no code fences, no prose) " +
@@ -29,42 +30,40 @@ namespace FoodFestAPI.Helpers
 
         public async Task<RecipeGenerateResult> GenerateAsync(string prompt)
         {
-            var apiKey = _config["Anthropic:ApiKey"];
+            var apiKey = _config["OpenAI:ApiKey"];
             if (string.IsNullOrWhiteSpace(apiKey))
             {
-                _log.LogWarning("Anthropic API key not configured; recipe generation unavailable.");
+                _log.LogWarning("OpenAI API key not configured; recipe generation unavailable.");
                 return null;
             }
 
             try
             {
-                AnthropicClient client = new(new ClientOptions { ApiKey = apiKey });
+                ChatClient client = new(model: Model, apiKey: apiKey);
 
-                MessageCreateParams parameters = new()
+                List<ChatMessage> messages =
+                [
+                    new SystemChatMessage(SystemPrompt),
+                    new UserChatMessage(prompt),
+                ];
+
+                // JsonObject response format guarantees the model returns valid JSON.
+                ChatCompletionOptions options = new()
                 {
-                    Model = "claude-opus-4-8",
-                    MaxTokens = 2000,
-                    System = SystemPrompt,
-                    Messages =
-                    [
-                        new()
-                        {
-                            Role = Role.User,
-                            Content = prompt,
-                        },
-                    ],
+                    ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat(),
                 };
 
-                var message = await client.Messages.Create(parameters);
+                ChatCompletion completion = await client.CompleteChatAsync(messages, options);
 
-                var sb = new System.Text.StringBuilder();
-                foreach (var block in message.Content)
+                var sb = new StringBuilder();
+                foreach (var part in completion.Content)
                 {
-                    if (block.TryPickText(out var textBlock) && textBlock is not null)
-                        sb.Append(textBlock.Text);
+                    if (!string.IsNullOrEmpty(part.Text))
+                        sb.Append(part.Text);
                 }
                 var raw = sb.ToString().Trim();
 
+                // Defensive: strip accidental code fences if present.
                 if (raw.StartsWith("```"))
                 {
                     int firstBrace = raw.IndexOf('{');
