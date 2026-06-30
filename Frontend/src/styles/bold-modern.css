@@ -1,0 +1,24 @@
+/* Bold & Modern theme layer. Scoped via .bm-* classes so it does not
+   override the existing theme globally. Tokens are CSS variables. */
+:root {
+  --bm-bg: #0f0f12;
+  --bm-panel: #16161a;
+  --bm-card: #1c1c22;
+  --bm-border: #26262c;
+  --bm-accent: #ff5a3c;
+  --bm-text: #e7e7ea;
+  --bm-muted: #9a9aa2;
+  --bm-faint: #6f6f78;
+}
+
+.bm-section { background: var(--bm-bg); color: var(--bm-text); padding: 80px 0; border-top: 1px solid var(--bm-border); }
+.bm-section--panel { background: var(--bm-panel); }
+.bm-label { color: var(--bm-accent); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+.bm-title { font-size: clamp(24px, 4vw, 40px); font-weight: 900; letter-spacing: -1px; line-height: 1.05; margin: 8px 0 16px; }
+.bm-btn { display: inline-block; background: var(--bm-accent); color: #fff; font-weight: 800; padding: 12px 22px; border-radius: 4px; border: 0; text-decoration: none; cursor: pointer; }
+.bm-btn--outline { background: transparent; border: 1px solid var(--bm-border); color: var(--bm-text); }
+.bm-card { background: var(--bm-card); border: 1px solid var(--bm-border); border-radius: 10px; overflow: hidden; }
+.bm-overlay { background: linear-gradient(90deg, rgba(15,15,18,.85), rgba(15,15,18,.45)); position: absolute; inset: 0; }
+.bm-rank { position: absolute; top: 8px; left: 8px; background: var(--bm-accent); color: #fff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 12px; }
+.bm-heart { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 0; cursor: pointer; background: rgba(15,15,18,.8); color: var(--bm-accent); }
+.bm-heart--on { background: var(--bm-accent); color: #fff; }
