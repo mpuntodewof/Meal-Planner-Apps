@@ -36,6 +36,9 @@ services:
       # Tell Kestrel which URL to bind
       - ASPNETCORE_URLS=http://+:5128
       - ASPNETCORE_ENVIRONMENT=Production
+      # OpenAI key for the AI recipe generator — value comes from the gitignored .env file
+      # (docker compose substitutes ${OpenAI__ApiKey}); never hardcode the key here.
+      - OpenAI__ApiKey=${OpenAI__ApiKey:-}
     depends_on:
       db:
         condition: service_healthy
