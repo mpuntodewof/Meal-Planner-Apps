@@ -22,3 +22,16 @@
 .bm-rank { position: absolute; top: 8px; left: 8px; background: var(--bm-accent); color: #fff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 12px; }
 .bm-heart { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 0; cursor: pointer; background: rgba(15,15,18,.8); color: var(--bm-accent); }
 .bm-heart--on { background: var(--bm-accent); color: #fff; }
+
+/* Responsive nav */
+.bm-hamburger { display: none; flex-direction: column; gap: 4px; background: none; border: 0; cursor: pointer; padding: 8px; }
+.bm-hamburger span { width: 24px; height: 2px; background: var(--bm-text); display: block; }
+.bm-overlay-menu { position: fixed; inset: 0; background: rgba(15,15,18,.97); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.bm-overlay-menu a { color: var(--bm-text); font-size: 28px; font-weight: 800; text-decoration: none; }
+.bm-overlay-menu .bm-secondary { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 16px; }
+.bm-overlay-menu .bm-secondary a { font-size: 16px; font-weight: 600; color: var(--bm-muted); }
+.bm-overlay-close { position: absolute; top: 18px; right: 22px; background: none; border: 0; color: var(--bm-accent); font-size: 28px; cursor: pointer; }
+@media (max-width: 992px) {
+  .bm-hamburger { display: flex; }
+  .bm-desktop-menu { display: none !important; }
+}
