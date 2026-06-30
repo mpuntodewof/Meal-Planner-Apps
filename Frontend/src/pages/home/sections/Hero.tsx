@@ -10,7 +10,7 @@ function Hero() {
       <div className="container" style={{ position: "relative" }}>
         <div className="bm-label">Cooking Ideas</div>
         <h1 className="bm-title" style={{ color: "#fff", maxWidth: 620 }}>Cook bold.<br />Eat better.</h1>
-        <p style={{ color: "var(--bm-muted)", maxWidth: 460, marginBottom: 20 }}>
+        <p style={{ color: "rgba(255,255,255,.85)", maxWidth: 460, marginBottom: 20 }}>
           Curated recipes, meal plans, and food stories — all in one place.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>

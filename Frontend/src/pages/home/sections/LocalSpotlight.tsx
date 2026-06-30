@@ -15,7 +15,7 @@ function LocalSpotlight() {
               <img src={nusantara} alt="Dish of the week" style={{ width: "100%", height: 320, objectFit: "cover" }} />
               <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: 20, background: "linear-gradient(transparent, rgba(15,15,18,.95))" }}>
                 <h3 style={{ color: "#fff", fontWeight: 800 }}>Rendang &amp; Regional Classics</h3>
-                <p style={{ color: "var(--bm-muted)", margin: 0 }}>Slow-cooked, spice-forward dishes that define Indonesian home cooking.</p>
+                <p style={{ color: "rgba(255,255,255,.85)", margin: 0 }}>Slow-cooked, spice-forward dishes that define Indonesian home cooking.</p>
               </div>
             </div>
           </div>

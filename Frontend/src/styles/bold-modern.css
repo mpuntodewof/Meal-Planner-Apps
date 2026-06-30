@@ -1,33 +1,42 @@
-/* Bold & Modern theme layer. Scoped via .bm-* classes so it does not
-   override the existing theme globally. Tokens are CSS variables. */
+/* Bold & Modern theme layer — LIGHT.
+   Scoped via .bm-* classes. Tokens are CSS variables so the whole
+   palette can be retuned in one place. Light direction chosen for a
+   consistent look with the original recipe pages. */
 :root {
-  --bm-bg: #0f0f12;
-  --bm-panel: #16161a;
-  --bm-card: #1c1c22;
-  --bm-border: #26262c;
-  --bm-accent: #ff5a3c;
-  --bm-text: #e7e7ea;
-  --bm-muted: #9a9aa2;
-  --bm-faint: #6f6f78;
+  --bm-bg: #f9f6ee;       /* page background (warm cream, matches original theme) */
+  --bm-panel: #ffffff;    /* alternating band */
+  --bm-card: #ffffff;     /* cards */
+  --bm-border: #e6e2d8;   /* hairline borders */
+  --bm-accent: #f28123;   /* orange accent (original theme accent) */
+  --bm-text: #1f1d1a;     /* primary text */
+  --bm-muted: #5f5a52;    /* secondary text */
+  --bm-faint: #908a80;    /* faint meta text */
+  --bm-shadow: 0 6px 22px rgba(31, 29, 26, .08); /* soft card lift on light bg */
 }
+
+/* Make the whole app surface light so dark default-theme bleed-through is gone
+   and bm-sections blend with the page instead of floating. */
+body { background: var(--bm-bg); }
 
 .bm-section { background: var(--bm-bg); color: var(--bm-text); padding: 80px 0; border-top: 1px solid var(--bm-border); }
 .bm-section--panel { background: var(--bm-panel); }
 .bm-label { color: var(--bm-accent); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
-.bm-title { font-size: clamp(24px, 4vw, 40px); font-weight: 900; letter-spacing: -1px; line-height: 1.05; margin: 8px 0 16px; }
+.bm-title { font-size: clamp(24px, 4vw, 40px); font-weight: 900; letter-spacing: -1px; line-height: 1.05; margin: 8px 0 16px; color: var(--bm-text); }
 .bm-btn { display: inline-block; background: var(--bm-accent); color: #fff; font-weight: 800; padding: 12px 22px; border-radius: 4px; border: 0; text-decoration: none; cursor: pointer; }
-.bm-btn--outline { background: transparent; border: 1px solid var(--bm-border); color: var(--bm-text); }
-.bm-card { background: var(--bm-card); border: 1px solid var(--bm-border); border-radius: 10px; overflow: hidden; }
-.bm-overlay { background: linear-gradient(90deg, rgba(15,15,18,.85), rgba(15,15,18,.45)); position: absolute; inset: 0; }
+.bm-btn--outline { background: transparent; border: 1px solid var(--bm-accent); color: var(--bm-accent); }
+.bm-card { background: var(--bm-card); border: 1px solid var(--bm-border); border-radius: 10px; overflow: hidden; box-shadow: var(--bm-shadow); }
+/* Dark gradient is intentional: it sits over hero PHOTOS to keep white text
+   legible. Correct on a light page too. */
+.bm-overlay { background: linear-gradient(90deg, rgba(15,15,18,.78), rgba(15,15,18,.35)); position: absolute; inset: 0; }
 .bm-rank { position: absolute; top: 8px; left: 8px; background: var(--bm-accent); color: #fff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 12px; }
-.bm-heart { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 0; cursor: pointer; background: rgba(15,15,18,.8); color: var(--bm-accent); }
+.bm-heart { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 0; cursor: pointer; background: rgba(255,255,255,.92); color: var(--bm-accent); box-shadow: 0 2px 8px rgba(31,29,26,.18); }
 .bm-heart--on { background: var(--bm-accent); color: #fff; }
 
 /* Responsive nav */
 .bm-hamburger { display: none; flex-direction: column; gap: 4px; background: none; border: 0; cursor: pointer; padding: 8px; }
 .bm-hamburger span { width: 24px; height: 2px; background: var(--bm-text); display: block; }
-.bm-overlay-menu { position: fixed; inset: 0; background: rgba(15,15,18,.97); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
-.bm-overlay-menu a { color: var(--bm-text); font-size: 28px; font-weight: 800; text-decoration: none; }
+.bm-overlay-menu { position: fixed; inset: 0; background: rgba(249,246,238,.98); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.bm-overlay-menu a { color: var(--bm-text); font-size: 28px; font-weight: 800; text-decoration: none; cursor: pointer; }
 .bm-overlay-menu .bm-secondary { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 16px; }
 .bm-overlay-menu .bm-secondary a { font-size: 16px; font-weight: 600; color: var(--bm-muted); }
 .bm-overlay-close { position: absolute; top: 18px; right: 22px; background: none; border: 0; color: var(--bm-accent); font-size: 28px; cursor: pointer; }
@@ -35,3 +44,11 @@
   .bm-hamburger { display: flex; }
   .bm-desktop-menu { display: none !important; }
 }
+
+/* Interactive card hover lift (news, about CTA) */
+.bm-card--link { transition: transform .18s ease, box-shadow .18s ease; cursor: pointer; }
+.bm-card--link:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(31,29,26,.14); }
+.bm-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.bm-link { color: var(--bm-accent); font-weight: 700; font-size: 13px; text-decoration: none; }
+.bm-link:hover { text-decoration: underline; }
+.bm-meta-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--bm-border); margin-top: 12px; padding-top: 10px; }
