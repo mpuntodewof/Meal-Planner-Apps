@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "../../components/sub-comp";
 import Footer from "../../components/Footer";
 import newsData from "../../data/newsData";
@@ -6,6 +7,7 @@ import newsModel from "../../interfaces/newsModel";
 import newsHero from "../../img/latest-news/news-bg-5.jpg";
 
 function News() {
+  const navigate = useNavigate();
   return (
     <>
       <Navbar />
@@ -30,7 +32,7 @@ function News() {
         <div className="container">
           <div className="bm-news-list" style={{ margin: "0 auto" }}>
             {newsData.map((item: newsModel) => (
-              <article className="bm-news-row" key={item.id}>
+              <article className="bm-news-row" key={item.id} onClick={() => navigate(`/news/${item.id}`)}>
                 <img src={item.imageUrl} alt={item.title} />
                 <div className="bm-news-body">
                   <div className="bm-label" style={{ fontSize: 11 }}>{item.author}</div>
