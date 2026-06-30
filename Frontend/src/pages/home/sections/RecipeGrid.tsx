@@ -23,8 +23,8 @@ function RecipeGrid() {
   return (
     <div id="recipes" className="bm-section bm-section--panel">
       <div className="container">
-        <div className="bm-label">Recipes</div>
-        <h2 className="bm-title">Most Viewed Recipes</h2>
+        <div className="bm-label">🍽 Browse</div>
+        <h2 className="bm-title">All Recipes</h2>
         {isLoading ? <Loader /> : (
           <div className="row">
             {recipes.map((recipe: recipeModel, index: number) => (

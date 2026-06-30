@@ -5,7 +5,7 @@ import heroBg from "../../../img/food-bg-3.webp";
 function Hero() {
   const navigate = useNavigate();
   return (
-    <div style={{ position: "relative", minHeight: 460, display: "flex", alignItems: "center", backgroundImage: `url(${heroBg})`, backgroundSize: "cover", backgroundPosition: "center" }}>
+    <div style={{ position: "relative", minHeight: 560, display: "flex", alignItems: "center", paddingTop: 140, paddingBottom: 60, backgroundImage: `url(${heroBg})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       <div className="bm-overlay" />
       <div className="container" style={{ position: "relative" }}>
         <div className="bm-label">Cooking Ideas</div>

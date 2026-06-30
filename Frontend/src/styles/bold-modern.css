@@ -33,8 +33,13 @@ body { background: var(--bm-bg); }
 .bm-heart--on { background: var(--bm-accent); color: #fff; }
 
 /* Responsive nav */
-.bm-hamburger { display: none; flex-direction: column; gap: 4px; background: none; border: 0; cursor: pointer; padding: 8px; }
-.bm-hamburger span { width: 24px; height: 2px; background: var(--bm-text); display: block; }
+.bm-hamburger {
+  display: none; flex-direction: column; gap: 5px; cursor: pointer;
+  padding: 10px; border-radius: 8px; border: 0;
+  background: var(--bm-accent);
+  position: absolute; top: 50%; right: 16px; transform: translateY(-50%); z-index: 1001;
+}
+.bm-hamburger span { width: 24px; height: 3px; border-radius: 2px; background: #fff; display: block; }
 .bm-overlay-menu { position: fixed; inset: 0; background: rgba(249,246,238,.98); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
 .bm-overlay-menu a { color: var(--bm-text); font-size: 28px; font-weight: 800; text-decoration: none; cursor: pointer; }
 .bm-overlay-menu .bm-secondary { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 16px; }
@@ -43,6 +48,10 @@ body { background: var(--bm-bg); }
 @media (max-width: 992px) {
   .bm-hamburger { display: flex; }
   .bm-desktop-menu { display: none !important; }
+  /* hide leftover original-theme mobile bits so only our hamburger shows */
+  .main-menu-wrap .mobile-show,
+  .main-menu-wrap .mobile-menu { display: none !important; }
+  .main-menu-wrap { position: relative; min-height: 70px; }
 }
 
 /* Interactive card hover lift (news, about CTA) */
@@ -52,3 +61,12 @@ body { background: var(--bm-bg); }
 .bm-link { color: var(--bm-accent); font-weight: 700; font-size: 13px; text-decoration: none; }
 .bm-link:hover { text-decoration: underline; }
 .bm-meta-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--bm-border); margin-top: 12px; padding-top: 10px; }
+
+/* Single recipe: quick-facts tiles + rating */
+.bm-facts { display: flex; flex-wrap: wrap; gap: 12px; margin: 4px 0 24px; }
+.bm-fact { flex: 1 1 140px; background: var(--bm-card); border: 1px solid var(--bm-border); border-radius: 10px; padding: 16px; box-shadow: var(--bm-shadow); }
+.bm-fact .bm-fact-ico { color: var(--bm-accent); font-size: 18px; }
+.bm-fact .bm-fact-val { font-size: 20px; font-weight: 800; color: var(--bm-text); margin-top: 6px; }
+.bm-fact .bm-fact-lbl { font-size: 12px; color: var(--bm-faint); text-transform: uppercase; letter-spacing: 1px; }
+.bm-stars { color: var(--bm-accent); font-size: 18px; letter-spacing: 2px; }
+.bm-step-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--bm-accent); color: #fff; font-size: 13px; font-weight: 800; margin-right: 10px; flex: 0 0 auto; }

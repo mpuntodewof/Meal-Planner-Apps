@@ -132,8 +132,8 @@ function ProductCatalog() {
 							<div className="row">
 								{setFavorites.length > 0 ?
 									favorites.map((fav: favoriteModel, index: number) => (
-										<div className="col-lg-4 col-md-6" key={index}>
-											<div className="bm-card" style={{ height: "100%" }}>
+										<div className="col-lg-4 col-md-6 mb-4 d-flex" key={index}>
+											<div className="bm-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
 												<div style={{ position: "relative", height: 200 }}>
 													<div className="latest-news-bg" style={{ backgroundImage: `url(${fav.imageUrl})`, width: "100%", height: "100%", backgroundSize: "cover", backgroundPosition: "center" }}></div>
 													<button className={`bm-heart ${fav.isFavorited ? "bm-heart--on" : ""}`} style={{ position: "absolute", top: 10, right: 10 }} onClick={() => toggleLiked(fav.recipeId)}>

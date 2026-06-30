@@ -13,8 +13,8 @@ function TrendingNow() {
   return (
     <div className="bm-section bm-section--panel">
       <div className="container">
-        <div className="bm-label">🔥 Trending Now</div>
-        <h2 className="bm-title">Hot in the kitchen</h2>
+        <div className="bm-label">⏱ Latest Recipes</div>
+        <h2 className="bm-title">Fresh from the kitchen</h2>
         <div style={{ display: "flex", gap: 16, overflowX: "auto", paddingBottom: 8 }}>
           {trending.map((recipe: recipeModel, i: number) => (
             <div key={recipe.id} className="bm-card" style={{ minWidth: 240, flex: "0 0 auto", cursor: "pointer" }} onClick={() => navigate(`/singleProduct/${recipe.id}`)}>
