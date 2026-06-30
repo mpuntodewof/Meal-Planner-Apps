@@ -106,6 +106,9 @@ function Navbar() {
                                   <a onClick={() => navigate("/addProduct")}>Create Recipe</a>
                                 </li>
                                 <li>
+                                  <a onClick={() => navigate("/mealPlan")}>Meal Plan</a>
+                                </li>
+                                <li>
                                   <a onClick={() => navigate(`/userProfile/${userData.id}`)}>User Profile</a>
                                 </li>
                                 <li>
@@ -164,6 +167,7 @@ function Navbar() {
             {userData.id ? (
               <>
                 <a onClick={() => go("/addProduct")}>Create Recipe</a>
+                <a onClick={() => go("/mealPlan")}>Meal Plan</a>
                 <a onClick={() => go(`/userProfile/${userData.id}`)}>User Profile</a>
                 <a onClick={() => { setMenuOpen(false); handleLogout(); }}>Logout</a>
               </>
