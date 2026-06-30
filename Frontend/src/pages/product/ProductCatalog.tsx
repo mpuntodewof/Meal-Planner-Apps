@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 // import { Footer, Loader, Navbar } from 'rsuite'
 import { useAddRemoveFavoriteMutation, useGetFavoriteByUserIdQuery } from '../../api/favoriteApi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -35,16 +35,16 @@ function ProductCatalog() {
 		}
 	}, [data, isLoading]);
 
-	const favData = {
+	const favData = useMemo(() => ({
 		favoriteDTOs:
-			favorites.map((item, i) => ({
+			favorites.map((item) => ({
 				recipeId: item.recipeId,
 				userId: item.userId,
 				isFavorited: item.isFavorited
 			})).filter(
 				(fav) => fav.recipeId !== null && fav.userId !== null
 			)
-	};
+	}), [favorites]);
 
 	// post data when page refreshed
 	useEffect(() => {
@@ -58,7 +58,7 @@ function ProductCatalog() {
 		}
 
 		postData();
-	}, [addRemoveFavorite]);
+	}, [addRemoveFavorite, favData]);
 
 	// console.log({ favorites, data });
 
