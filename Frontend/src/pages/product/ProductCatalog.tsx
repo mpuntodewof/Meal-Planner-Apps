@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 // import { Footer, Loader, Navbar } from 'rsuite'
 import { useAddRemoveFavoriteMutation, useGetFavoriteByUserIdQuery } from '../../api/favoriteApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Loader, Navbar } from '../../components/sub-comp';
-import { Button } from 'react-bootstrap';
 import storeRedux, { RootState } from '../../redux/store/storeRedux';
 import { setFavorite } from '../../redux/reducerAction/favoriteSlice';
 import salmon from '../../img/istockphoto-174914813-612x612.jpg';
@@ -35,16 +34,16 @@ function ProductCatalog() {
 		}
 	}, [data, isLoading]);
 
-	const favData = {
+	const favData = useMemo(() => ({
 		favoriteDTOs:
-			favorites.map((item, i) => ({
+			favorites.map((item) => ({
 				recipeId: item.recipeId,
 				userId: item.userId,
 				isFavorited: item.isFavorited
 			})).filter(
 				(fav) => fav.recipeId !== null && fav.userId !== null
 			)
-	};
+	}), [favorites]);
 
 	// post data when page refreshed
 	useEffect(() => {
@@ -58,7 +57,7 @@ function ProductCatalog() {
 		}
 
 		postData();
-	}, [addRemoveFavorite]);
+	}, [addRemoveFavorite, favData]);
 
 	// console.log({ favorites, data });
 
@@ -114,13 +113,14 @@ function ProductCatalog() {
 				<>
 					<Navbar />
 
-					<div className="breadcrumb-section" style={{ backgroundImage: `url(${salmon})` }}>
-						<div className="container">
+					<div className="breadcrumb-section" style={{ position: "relative", backgroundImage: `url(${salmon})`, backgroundSize: "cover", backgroundPosition: "center" }}>
+						<div className="bm-overlay" />
+						<div className="container" style={{ position: "relative" }}>
 							<div className="row">
 								<div className="col-lg-8 offset-lg-2 text-center">
 									<div className="breadcrumb-text">
-										<p>Food Recipe Apps</p>
-										<h1>Recipe Catalog</h1>
+										<p className="bm-label">Food Recipe Apps</p>
+										<h1 style={{ color: "#fff", fontWeight: 900 }}>Recipe Catalog</h1>
 									</div>
 								</div>
 							</div>
@@ -132,46 +132,21 @@ function ProductCatalog() {
 							<div className="row">
 								{setFavorites.length > 0 ?
 									favorites.map((fav: favoriteModel, index: number) => (
-										<div className="col-lg-4 col-md-6" key={index}>
-											<div className="single-latest-news">
-												<a href="single-news.html">
-													<div className="latest-news-bg news-bg-1" style={{ backgroundImage: `url(${fav.imageUrl})`, width: "100%", objectFit: "cover" }}></div>
-												</a>
-												<div className="news-text-box">
-													<div className="row">
-														<div className="col-lg-8">
-															<h3 style={{ textWrap: 'wrap', height: 55, alignContent: 'center' }}>
-																{fav.recipeName}
-															</h3>
-														</div>
-														<div className="col-lg-4">
-															<Button variant="danger" onClick={() => toggleLiked(fav.recipeId)} style={{ marginLeft: '50px', marginTop: '10px', borderRadius: '50%' }}>
-																{
-																	fav.isFavorited ? (<i className="fas fa-heart" style={{ color: 'red' }}></i>) : (<i className="fas fa-heart"></i>)
-																}
-															</Button>
-														</div>
-													</div>
-
-													<p className="blog-meta">
-														<span className="author"><i className="fas fa-user"></i> Recipes Author</span>
-														<span className="date"><i className="fas fa-calendar"></i> {fav.createdAt && new Date(fav.createdAt).toLocaleDateString()}</span>
+										<div className="col-lg-4 col-md-6 mb-4 d-flex" key={index}>
+											<div className="bm-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+												<div style={{ position: "relative", height: 200 }}>
+													<div className="latest-news-bg" style={{ backgroundImage: `url(${fav.imageUrl})`, width: "100%", height: "100%", backgroundSize: "cover", backgroundPosition: "center" }}></div>
+													<button className={`bm-heart ${fav.isFavorited ? "bm-heart--on" : ""}`} style={{ position: "absolute", top: 10, right: 10 }} onClick={() => toggleLiked(fav.recipeId)}>
+														<i className="fas fa-heart"></i>
+													</button>
+												</div>
+												<div style={{ padding: 16 }}>
+													<h3 style={{ fontSize: 18, fontWeight: 700, minHeight: 50 }}>{fav.recipeName}</h3>
+													<p style={{ color: "var(--bm-faint)", fontSize: 13 }}>
+														<i className="fas fa-calendar"></i> {fav.createdAt && new Date(fav.createdAt).toLocaleDateString()}
 													</p>
-
-													<p
-														className="except"
-														style={{
-															overflow: 'hidden',
-															display: "-webkit-box",
-															WebkitLineClamp: 4,
-															WebkitBoxOrient: "vertical",
-															height: 100
-														}}
-													>
-														{fav.description}
-													</p>
-
-													<a onClick={() => navigate(`/singleProduct/${fav.recipeId}`)} className="read-more-btn">read more <i className="fas fa-angle-right"></i></a>
+													<p style={{ color: "var(--bm-muted)", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", height: 66 }}>{fav.description}</p>
+													<a onClick={() => navigate(`/singleProduct/${fav.recipeId}`)} className="bm-btn" style={{ fontSize: 13, padding: "8px 16px" }}>Read more</a>
 												</div>
 											</div>
 										</div>
@@ -186,20 +161,10 @@ function ProductCatalog() {
 									<div className="row">
 										<div className="col-lg-12 text-center">
 											<div className="pagination-wrap">
-												<ul>
-													<li>
-														<a onClick={() => handlePageChange(pageNumber - 1)}>
-															Previous
-														</a>
-													</li>
-													<li>
-														<p> Page {pageNumber} of {totalPages} </p>
-													</li>
-													<li>
-														<a onClick={() => handlePageChange(pageNumber + 1)}>
-															Next
-														</a>
-													</li>
+												<ul style={{ listStyle: "none", display: "flex", gap: 12, justifyContent: "center", alignItems: "center", padding: 0 }}>
+													<li><a style={{ color: "var(--bm-muted)", cursor: "pointer" }} onClick={() => handlePageChange(pageNumber - 1)}>‹ Previous</a></li>
+													<li><span className="bm-btn" style={{ padding: "4px 12px" }}>{pageNumber}</span> <span style={{ color: "var(--bm-faint)" }}>of {totalPages}</span></li>
+													<li><a style={{ color: "var(--bm-muted)", cursor: "pointer" }} onClick={() => handlePageChange(pageNumber + 1)}>Next ›</a></li>
 												</ul>
 											</div>
 										</div>

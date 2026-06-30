@@ -16,13 +16,15 @@ namespace FoodFestAPI.Controllers
         private ApiResponse _response;
         private readonly IImageService _imgService;
         private readonly ILogger<RecipeController> _log;
+        private readonly IAiRecipeService _aiRecipeService;
 
-        public RecipeController(ApplicationDbContext ctx, IConfiguration config, IImageService imgService, ILogger<RecipeController> log)
+        public RecipeController(ApplicationDbContext ctx, IConfiguration config, IImageService imgService, ILogger<RecipeController> log, IAiRecipeService aiRecipeService)
         {
             _ctx = ctx;
             _response = new ApiResponse();
             _imgService = imgService;
             _log = log;
+            _aiRecipeService = aiRecipeService;
         }
 
         [HttpGet]
@@ -183,6 +185,33 @@ namespace FoodFestAPI.Controllers
             }
 
             return _response;
+        }
+
+        [HttpPost("generate")]
+        public async Task<ActionResult<ApiResponse>> GenerateRecipe([FromBody] GenerateRecipeRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Prompt))
+            {
+                _response.IsSuccess = false;
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.ErrorMessages = new List<string> { "Please enter a description of the recipe you want." };
+                return BadRequest(_response);
+            }
+
+            var result = await _aiRecipeService.GenerateAsync(request.Prompt);
+
+            if (result == null)
+            {
+                _response.IsSuccess = false;
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.ErrorMessages = new List<string> { "Couldn't generate a recipe right now. Please try again." };
+                return StatusCode(500, _response);
+            }
+
+            _response.IsSuccess = true;
+            _response.StatusCode = HttpStatusCode.OK;
+            _response.Result = result;
+            return Ok(_response);
         }
 
         [HttpPut("{id:int}")]

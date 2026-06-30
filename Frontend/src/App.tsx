@@ -5,8 +5,6 @@ import { setLoggedInUser } from './redux/reducerAction/userAuthSlice';
 
 import AddProduct from './pages/product/AddProduct';
 import SingleProduct from './pages/product/SingleProduct';
-import Header from './components/Header';
-import Footer from './components/Footer';
 import Product from './pages/product/Product';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -35,13 +33,7 @@ function App() {
       {/* <> */}
         {/* <Header /> */}
         <Routes>
-          <Route path="/" element={
-            <>
-              <Header />
-              <Home />
-              <Footer />
-            </>
-          } />
+          <Route path="/" element={<Home />} />
 
           <Route path="/product" element={<Product />} />
           <Route path="/addProduct" element={<AddProduct />} />

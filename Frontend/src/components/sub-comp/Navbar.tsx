@@ -12,6 +12,14 @@ function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [scroll, setScroll] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  const go = (path: string) => { setMenuOpen(false); navigate(path); };
 
   const userData: userModel = useSelector(
     (state: RootState) => state.userAuthStore
@@ -40,8 +48,8 @@ function Navbar() {
                 className="main-menu-wrap"
                 style={{
                   justifyContent: "center",
-                  // alignItems: "center", 
-                  // display:"flex" 
+                  // alignItems: "center",
+                  // display:"flex"
                 }}>
                 {/* <!-- logo --> */}
                 <div className="site-logo">
@@ -52,7 +60,7 @@ function Navbar() {
                 {/* <!-- logo --> */}
 
                 {/* <!-- menu start --> */}
-                <nav className="main-menu">
+                <nav className="main-menu bm-desktop-menu">
                   <ul>
                     <li>
                       <a className="mobile-hide search-bar-icon" href="#">
@@ -66,10 +74,10 @@ function Navbar() {
                       <a onClick={() => navigate("/productCatalog")}>Recipe</a>
                     </li>
                     <li>
-                      <a href="news.html">News</a>
+                      <a href="#news">News</a>
                     </li>
                     <li>
-                      <a href="#">About</a>
+                      <a href="#about">About</a>
                     </li>
 
                     {userData.role == Roles.ADMIN && (
@@ -119,6 +127,10 @@ function Navbar() {
                   </ul>
                 </nav>
 
+                <button className="bm-hamburger" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
+                  <span></span><span></span><span></span>
+                </button>
+
                 {/* <nav className="main-menu">
                   <ul>
                     <li>
@@ -140,6 +152,30 @@ function Navbar() {
           </div>
         </div>
       </div>
+
+      {menuOpen && (
+        <div className="bm-overlay-menu">
+          <button className="bm-overlay-close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>✕</button>
+          <a onClick={() => go("/")}>Home</a>
+          <a onClick={() => go("/productCatalog")}>Recipe</a>
+          <a onClick={() => { setMenuOpen(false); window.location.hash = "#news"; }}>News</a>
+          <a onClick={() => { setMenuOpen(false); window.location.hash = "#about"; }}>About</a>
+          <div className="bm-secondary">
+            {userData.id ? (
+              <>
+                <a onClick={() => go("/addProduct")}>Create Recipe</a>
+                <a onClick={() => go(`/userProfile/${userData.id}`)}>User Profile</a>
+                <a onClick={() => { setMenuOpen(false); handleLogout(); }}>Logout</a>
+              </>
+            ) : (
+              <>
+                <a onClick={() => go("/login")}>Login</a>
+                <a onClick={() => go("/register")}>Register</a>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

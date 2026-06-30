@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import storeRedux from './redux/store/storeRedux';
 import "react-toastify/dist/ReactToastify.css";
+import "./styles/bold-modern.css";
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 
