@@ -17,14 +17,32 @@ namespace FoodFestAPI.Controllers
         private readonly IImageService _imgService;
         private readonly ILogger<RecipeController> _log;
         private readonly IAiRecipeService _aiRecipeService;
+        private readonly INutritionService _nutritionService;
 
-        public RecipeController(ApplicationDbContext ctx, IConfiguration config, IImageService imgService, ILogger<RecipeController> log, IAiRecipeService aiRecipeService)
+        public RecipeController(ApplicationDbContext ctx, IConfiguration config, IImageService imgService, ILogger<RecipeController> log, IAiRecipeService aiRecipeService, INutritionService nutritionService)
         {
             _ctx = ctx;
             _response = new ApiResponse();
             _imgService = imgService;
             _log = log;
             _aiRecipeService = aiRecipeService;
+            _nutritionService = nutritionService;
+        }
+
+        // Estimates per-serving nutrition and stores it on the recipe. Never
+        // throws: on failure the columns are left null (shown as "not analyzed").
+        // Assumes recipe.Ingredients is loaded/attached.
+        private async Task EstimateAndStoreNutritionAsync(Recipe recipe)
+        {
+            var nutrition = await _nutritionService.EstimateAsync(recipe);
+            if (nutrition == null) return;
+
+            recipe.Calories = nutrition.Calories;
+            recipe.ProteinG = nutrition.ProteinG;
+            recipe.FatG = nutrition.FatG;
+            recipe.CarbsG = nutrition.CarbsG;
+            recipe.NutritionEstimatedAt = DateTime.UtcNow;
+            await _ctx.SaveChangesAsync();
         }
 
         [HttpGet]
@@ -156,6 +174,9 @@ namespace FoodFestAPI.Controllers
                             CreatedAt = DateTime.UtcNow,
                             Recipe = recipe,
                         };
+                        // Also track on the nav collection so nutrition estimation
+                        // below can read the ingredients without a re-query.
+                        recipe.Ingredients.Add(ingredientData);
                         _ctx.Ingredients.Add(ingredientData);
                     }
 
@@ -171,6 +192,10 @@ namespace FoodFestAPI.Controllers
                     }
 
                     await _ctx.SaveChangesAsync();
+
+                    // Estimate + store per-serving nutrition. Never blocks the save:
+                    // failure leaves nutrition null. Adds ~1-2s to this admin-only call.
+                    await EstimateAndStoreNutritionAsync(recipe);
 
                     _response.Result = recipe;
                     _response.StatusCode = HttpStatusCode.OK;
@@ -211,6 +236,48 @@ namespace FoodFestAPI.Controllers
             _response.IsSuccess = true;
             _response.StatusCode = HttpStatusCode.OK;
             _response.Result = result;
+            return Ok(_response);
+        }
+
+        // Estimates + stores nutrition for an existing recipe on demand. Used to
+        // backfill recipes created before nutrition analysis existed, and callable
+        // by a future background job. Returns the stored nutrition, or 502 if the
+        // estimator was unavailable (recipe is left with null nutrition).
+        [HttpPost("{id:int}/estimate-nutrition")]
+        public async Task<ActionResult<ApiResponse>> EstimateNutrition(int id)
+        {
+            var recipe = await _ctx.Recipes
+                .Include(r => r.Ingredients)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (recipe == null)
+            {
+                _response.IsSuccess = false;
+                _response.StatusCode = HttpStatusCode.NotFound;
+                return NotFound(_response);
+            }
+
+            await EstimateAndStoreNutritionAsync(recipe);
+
+            if (recipe.NutritionEstimatedAt == null)
+            {
+                _response.IsSuccess = false;
+                _response.StatusCode = HttpStatusCode.BadGateway;
+                _response.ErrorMessages = new List<string> { "Nutrition estimation is unavailable right now." };
+                return StatusCode(502, _response);
+            }
+
+            _response.IsSuccess = true;
+            _response.StatusCode = HttpStatusCode.OK;
+            _response.Result = new
+            {
+                recipe.Id,
+                recipe.Calories,
+                recipe.ProteinG,
+                recipe.FatG,
+                recipe.CarbsG,
+                recipe.NutritionEstimatedAt
+            };
             return Ok(_response);
         }
 
@@ -337,6 +404,17 @@ namespace FoodFestAPI.Controllers
                         _ctx.Instructions.RemoveRange(removeInstruction);
                         _ctx.SaveChanges();
                     }
+
+                    // Ingredients may have changed, so re-estimate nutrition. Reload
+                    // the current ingredient set so the estimate reflects the edits.
+                    recipe.Ingredients = await _ctx.Ingredients
+                        .Where(i => i.RecipeId == recipe.Id)
+                        .ToListAsync();
+                    await EstimateAndStoreNutritionAsync(recipe);
+
+                    _response.Result = recipe;
+                    _response.StatusCode = HttpStatusCode.OK;
+                    _response.IsSuccess = true;
                 }
                 else
                 {
