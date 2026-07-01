@@ -1,37 +1,17 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "../../components/sub-comp";
-import Footer from "../../components/Footer";
-import abt from "../../img/abt.jpg";
-import banner from "../../img/food-bg-2.webp";
+import abt from "../../../img/abt.jpg";
 
-function About() {
+function AboutSection() {
   const navigate = useNavigate();
   return (
-    <>
-      <Navbar />
-
-      {/* Banner */}
-      <div className="breadcrumb-section" style={{ position: "relative", backgroundImage: `url(${banner})`, backgroundSize: "cover", backgroundPosition: "center", minHeight: 300 }}>
-        <div className="bm-overlay" />
-        <div className="container" style={{ position: "relative" }}>
-          <div className="row">
-            <div className="col-lg-8 offset-lg-2 text-center">
-              <div className="breadcrumb-text">
-                <p className="bm-label">About</p>
-                <h1 style={{ color: "#fff", fontWeight: 900 }}>Who we are</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div id="about">
       {/* Mission + image */}
       <div className="bm-section">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-lg-7 mb-4">
-              <div className="bm-label">Our mission</div>
+              <div className="bm-label">About</div>
               <h2 className="bm-title">Cooking, made approachable</h2>
               <p style={{ color: "var(--bm-muted)", maxWidth: 560 }}>
                 FoodRecipe is a home for curated recipes, meal planning, and food stories.
@@ -74,10 +54,8 @@ function About() {
           </div>
         </div>
       </div>
-
-      <Footer />
-    </>
+    </div>
   );
 }
 
-export default About;
+export default AboutSection;
