@@ -74,10 +74,10 @@ function Navbar() {
                       <a onClick={() => navigate("/productCatalog")}>Recipe</a>
                     </li>
                     <li>
-                      <a href="#news">News</a>
+                      <a onClick={() => navigate("/news")}>News</a>
                     </li>
                     <li>
-                      <a href="#about">About</a>
+                      <a onClick={() => navigate("/about")}>About</a>
                     </li>
 
                     {userData.role == Roles.ADMIN && (
@@ -104,6 +104,9 @@ function Navbar() {
                               <ul className="sub-menu">
                                 <li>
                                   <a onClick={() => navigate("/addProduct")}>Create Recipe</a>
+                                </li>
+                                <li>
+                                  <a onClick={() => navigate("/mealPlan")}>Meal Plan</a>
                                 </li>
                                 <li>
                                   <a onClick={() => navigate(`/userProfile/${userData.id}`)}>User Profile</a>
@@ -158,12 +161,13 @@ function Navbar() {
           <button className="bm-overlay-close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>✕</button>
           <a onClick={() => go("/")}>Home</a>
           <a onClick={() => go("/productCatalog")}>Recipe</a>
-          <a onClick={() => { setMenuOpen(false); window.location.hash = "#news"; }}>News</a>
-          <a onClick={() => { setMenuOpen(false); window.location.hash = "#about"; }}>About</a>
+          <a onClick={() => go("/news")}>News</a>
+          <a onClick={() => go("/about")}>About</a>
           <div className="bm-secondary">
             {userData.id ? (
               <>
                 <a onClick={() => go("/addProduct")}>Create Recipe</a>
+                <a onClick={() => go("/mealPlan")}>Meal Plan</a>
                 <a onClick={() => go(`/userProfile/${userData.id}`)}>User Profile</a>
                 <a onClick={() => { setMenuOpen(false); handleLogout(); }}>Logout</a>
               </>

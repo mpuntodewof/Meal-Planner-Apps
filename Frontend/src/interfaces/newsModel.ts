@@ -7,4 +7,5 @@ export default interface newsModel {
   author: string;
   date: string;      // ISO string
   imageUrl: string;
+  body?: string[];   // article paragraphs; optional so list views don't need it
 }

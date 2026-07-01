@@ -15,7 +15,7 @@ function Hero() {
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <button className="bm-btn" onClick={() => navigate("/productCatalog")}>Browse Recipes</button>
-          <a className="bm-btn bm-btn--outline" href="#news">Read News</a>
+          <button className="bm-btn bm-btn--outline" onClick={() => navigate("/news")}>Read News</button>
         </div>
       </div>
     </div>

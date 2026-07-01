@@ -1,6 +1,9 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Footer() {
+  const navigate = useNavigate();
+  const linkStyle: React.CSSProperties = { color: "var(--bm-muted)", textDecoration: "none", cursor: "pointer" };
   return (
     <footer style={{ background: "var(--bm-panel)", color: "var(--bm-text)", borderTop: "1px solid var(--bm-border)", padding: "60px 0 24px" }}>
       <div className="container">
@@ -12,9 +15,9 @@ function Footer() {
           <div className="col-lg-4 mb-4">
             <div className="bm-label">Explore</div>
             <ul style={{ listStyle: "none", padding: 0, marginTop: 8 }}>
-              <li><a href="#recipes" style={{ color: "var(--bm-muted)", textDecoration: "none" }}>Recipes</a></li>
-              <li><a href="#news" style={{ color: "var(--bm-muted)", textDecoration: "none" }}>News</a></li>
-              <li><a href="#about" style={{ color: "var(--bm-muted)", textDecoration: "none" }}>About</a></li>
+              <li><a style={linkStyle} onClick={() => navigate("/productCatalog")}>Recipes</a></li>
+              <li><a style={linkStyle} onClick={() => navigate("/news")}>News</a></li>
+              <li><a style={linkStyle} onClick={() => navigate("/about")}>About</a></li>
             </ul>
           </div>
           <div className="col-lg-4 mb-4">

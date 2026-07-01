@@ -16,6 +16,9 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import UserProfile from './pages/auth/UserProfile';
 import MealPlanner from './pages/mealPlan/MealPlanner';
+import News from './pages/news/News';
+import NewsArticle from './pages/news/NewsArticle';
+import About from './pages/about/About';
 
 function App() {
   const dispatch = useDispatch();
@@ -40,6 +43,10 @@ function App() {
           <Route path="/addProduct/:id" element={<AddProduct />} />
           <Route path="/singleProduct/:recipeId" element={<SingleProduct />} />
           <Route path="/productCatalog" element={<ProductCatalog />} />
+
+          <Route path="/news" element={<News />} />
+          <Route path="/news/:id" element={<NewsArticle />} />
+          <Route path="/about" element={<About />} />
 
           <Route path="/mealPlan" element={<MealPlanner />} />
 
