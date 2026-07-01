@@ -1,9 +1,19 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 function Footer() {
   const navigate = useNavigate();
+  const location = useLocation();
   const linkStyle: React.CSSProperties = { color: "var(--bm-muted)", textDecoration: "none", cursor: "pointer" };
+  // About is a #about section on Home; scroll there (routing home first if needed).
+  const goAbout = () => {
+    if (location.pathname === "/") {
+      document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/");
+      setTimeout(() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+  };
   return (
     <footer style={{ background: "var(--bm-panel)", color: "var(--bm-text)", borderTop: "1px solid var(--bm-border)", padding: "60px 0 24px" }}>
       <div className="container">
@@ -17,7 +27,7 @@ function Footer() {
             <ul style={{ listStyle: "none", padding: 0, marginTop: 8 }}>
               <li><a style={linkStyle} onClick={() => navigate("/productCatalog")}>Recipes</a></li>
               <li><a style={linkStyle} onClick={() => navigate("/news")}>News</a></li>
-              <li><a style={linkStyle} onClick={() => navigate("/about")}>About</a></li>
+              <li><a style={linkStyle} onClick={goAbout}>About</a></li>
             </ul>
           </div>
           <div className="col-lg-4 mb-4">

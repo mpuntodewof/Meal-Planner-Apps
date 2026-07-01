@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import userModel from "../../interfaces/userModel";
 import { RootState } from "../../redux/store/storeRedux";
 import { emptyUserState, setLoggedInUser } from "../../redux/reducerAction/userAuthSlice";
@@ -20,6 +20,19 @@ function Navbar() {
   }, [menuOpen]);
 
   const go = (path: string) => { setMenuOpen(false); navigate(path); };
+
+  const location = useLocation();
+  // About lives as a #about section on Home. Scroll if already there,
+  // otherwise route to Home first, then scroll once it renders.
+  const goAbout = () => {
+    setMenuOpen(false);
+    if (location.pathname === "/") {
+      document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/");
+      setTimeout(() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+  };
 
   const userData: userModel = useSelector(
     (state: RootState) => state.userAuthStore
@@ -77,7 +90,7 @@ function Navbar() {
                       <a onClick={() => navigate("/news")}>News</a>
                     </li>
                     <li>
-                      <a onClick={() => navigate("/about")}>About</a>
+                      <a onClick={goAbout}>About</a>
                     </li>
 
                     {userData.role == Roles.ADMIN && (
@@ -162,7 +175,7 @@ function Navbar() {
           <a onClick={() => go("/")}>Home</a>
           <a onClick={() => go("/productCatalog")}>Recipe</a>
           <a onClick={() => go("/news")}>News</a>
-          <a onClick={() => go("/about")}>About</a>
+          <a onClick={goAbout}>About</a>
           <div className="bm-secondary">
             {userData.id ? (
               <>

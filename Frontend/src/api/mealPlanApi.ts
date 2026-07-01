@@ -14,6 +14,13 @@ const mealPlanApi = createApi({
       }),
       providesTags: ["MealPlans"],
     }),
+    getMealPlansByRange: builder.query({
+      query: ({ userId, start, end }) => ({
+        url: "mealPlan/range",
+        params: { userId, start, end },
+      }),
+      providesTags: ["MealPlans"],
+    }),
     createMealPlan: builder.mutation({
       query: (data) => ({
         url: "mealPlan",
@@ -23,9 +30,10 @@ const mealPlanApi = createApi({
       invalidatesTags: ["MealPlans"],
     }),
     deleteMealPlan: builder.mutation({
-      query: (id) => ({
+      query: ({ id, userId }) => ({
         url: `mealPlan/${id}`,
         method: "DELETE",
+        params: { userId },
       }),
       invalidatesTags: ["MealPlans"],
     }),
@@ -34,6 +42,7 @@ const mealPlanApi = createApi({
 
 export const {
   useGetMealPlansQuery,
+  useGetMealPlansByRangeQuery,
   useCreateMealPlanMutation,
   useDeleteMealPlanMutation,
 } = mealPlanApi;

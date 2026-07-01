@@ -162,7 +162,7 @@ The workspace offers the following functional modules:
 | **Recipe Catalog** | Dynamic paginated list of recipes with cover photos, description, and cooking times. | Fully Functional |
 | **Recipe Management** | Form with dynamic fields to add/remove ingredients and steps. Base64 file reader to local preview, image size/type validation, and Cloudinary uploads. | Fully Functional (Admin only) |
 | **Favorites System** | Mark recipes as favorite. Paginated view of favorite items. Deferred batch sync to MySQL database. | Fully Functional |
-| **Meal Planner** | Date-range navigation, calendar day selector, meal type categorization (Breakfast, Lunch, Dinner). | **Incomplete/WIP** (Backend logic implemented; Frontend is currently a UI mockup/placeholder) |
+| **Meal Planner** | Weekly navigation, calendar day selector, meal type categorization (Breakfast, Lunch, Dinner), add/remove meals, owner-scoped delete, date-range query, and duplicate-meal prevention (same recipe + day + meal type). | Fully Functional |
 
 ---
 

@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import Hero from "./home/sections/Hero";
 import TrendingNow from "./home/sections/TrendingNow";
 import LocalSpotlight from "./home/sections/LocalSpotlight";
+import AboutSection from "./home/sections/AboutSection";
 
 function Home() {
   return (
@@ -12,6 +13,7 @@ function Home() {
       <Hero />
       <TrendingNow />
       <LocalSpotlight />
+      <AboutSection />
       <Footer />
     </>
   );

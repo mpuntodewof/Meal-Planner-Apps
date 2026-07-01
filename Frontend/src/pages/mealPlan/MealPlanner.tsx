@@ -63,15 +63,15 @@ function MealPlanner() {
     const [createMealPlan] = useCreateMealPlanMutation();
     const [deleteMealPlan] = useDeleteMealPlanMutation();
 
-    // Client-side filtering & categorization
+    // Client-side filtering & categorization.
+    // The API returns a flat shape: each plan has a `dates` array (yyyy-MM-ddTHH:mm:ss)
+    // plus flattened recipe fields (recipeName, imageUrl, ...).
     const activeDayPlans = useMemo(() => {
         if (!mealPlansData || !mealPlansData.result || !mealPlansData.result.$values) return [];
         const selectedStr = format(selectedDate, "yyyy-MM-dd");
         return mealPlansData.result.$values.filter((plan: any) => {
-            if (!plan.mealPlanDays || !plan.mealPlanDays.$values) return false;
-            return plan.mealPlanDays.$values.some((day: any) => {
-                return format(new Date(day.date), "yyyy-MM-dd") === selectedStr;
-            });
+            const dates: string[] = plan.dates?.$values ?? plan.dates ?? [];
+            return dates.some((d: string) => format(new Date(d), "yyyy-MM-dd") === selectedStr);
         });
     }, [mealPlansData, selectedDate]);
 
@@ -102,6 +102,17 @@ function MealPlanner() {
             return;
         }
 
+        // Block duplicates: same recipe already scheduled for this day + meal type.
+        // activeDayPlans is already scoped to the selected day.
+        const recipeIdNum = parseInt(selectedRecipeId);
+        const alreadyScheduled = activeDayPlans.some(
+            (p: any) => p.recipeId === recipeIdNum && p.mealType?.toLowerCase() === modalMealType.toLowerCase()
+        );
+        if (alreadyScheduled) {
+            toastNotify(`This recipe is already in ${modalMealType} for the selected day.`, "error");
+            return;
+        }
+
         const planDateStr = format(selectedDate, "yyyy-MM-dd'T'00:00:00");
         const payload = {
             planName: planName,
@@ -123,14 +134,19 @@ function MealPlanner() {
             setShowAddModal(false);
         } catch (err: any) {
             console.error("Error creating meal plan:", err);
-            toastNotify("Failed to schedule meal plan", "error");
+            // 409 = the API rejected it as a duplicate (e.g. added from another tab).
+            if (err?.status === 409) {
+                toastNotify(`This recipe is already in ${modalMealType} for the selected day.`, "error");
+            } else {
+                toastNotify("Failed to schedule meal plan", "error");
+            }
         }
     };
 
     const handleDeleteMeal = async (id: number) => {
         if (window.confirm("Are you sure you want to remove this meal from your planner?")) {
             try {
-                await deleteMealPlan(id).unwrap();
+                await deleteMealPlan({ id, userId }).unwrap();
                 toastNotify("Meal removed from planner", "success");
             } catch (err) {
                 console.error("Error deleting meal plan:", err);
@@ -167,24 +183,23 @@ function MealPlanner() {
                         ) : (
                             <div className="meal-list">
                                 {meals.map((plan: any) => {
-                                    const recipe = plan.recipe;
                                     return (
                                         <div key={plan.id} className="d-flex align-items-center justify-content-between p-3 mb-3 border rounded shadow-sm bg-light">
                                             <div className="d-flex align-items-center">
-                                                <img 
-                                                    src={recipe?.imageUrl || salmon} 
-                                                    alt={recipe?.name} 
-                                                    className="rounded mr-3" 
-                                                    style={{ width: '80px', height: '80px', objectFit: 'cover' }} 
+                                                <img
+                                                    src={plan.imageUrl || salmon}
+                                                    alt={plan.recipeName}
+                                                    className="rounded mr-3"
+                                                    style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                                                 />
                                                 <div>
                                                     <h5 className="mb-1">
-                                                        <a href={`/singleProduct/${recipe?.id}`} className="text-dark font-weight-bold" style={{ textDecoration: 'none' }}>
-                                                            {recipe?.name}
+                                                        <a href={`/singleProduct/${plan.recipeId}`} className="text-dark font-weight-bold" style={{ textDecoration: 'none' }}>
+                                                            {plan.recipeName}
                                                         </a>
                                                     </h5>
                                                     <p className="mb-1 text-muted small">
-                                                        <i className="fa fa-clock-o mr-1"></i> {recipe?.cookingTime} | <i className="fa fa-users mr-1"></i> Servings: {recipe?.serviceSize}
+                                                        <i className="fa fa-clock-o mr-1"></i> {plan.cookingTime} | <i className="fa fa-users mr-1"></i> Servings: {plan.serviceSize}
                                                     </p>
                                                     <p className="mb-0 text-secondary font-italic small">
                                                         "{plan.planName}"
