@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+// import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store/storeRedux";
@@ -21,6 +21,10 @@ interface Props {
 
 const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner"];
 
+// The calendar day the user picked, as yyyy-MM-dd, taken from LOCAL date parts.
+// Avoids UTC drift where a local-midnight Date can serialize to the previous day.
+const toDayKey = (d: Date) => format(d, "yyyy-MM-dd");
+
 /**
  * Self-contained "schedule this recipe" modal. The recipe is fixed (passed in);
  * the user picks a date and meal type. Reusable from the recipe detail page and
@@ -37,10 +41,22 @@ function ScheduleMealModal({ show, onHide, recipeId, recipeName }: Props) {
   );
   const userId = userData.id;
 
-  const { data: mealPlansData } = useGetMealPlansQuery(userId, {
+  const { data: mealPlansData, refetch } = useGetMealPlansQuery(userId, {
     skip: !userId,
   });
   const [createMealPlan] = useCreateMealPlanMutation();
+
+  // Reset to fresh defaults each time the modal opens, and refetch the user's
+  // plans so the duplicate pre-check runs against current data (this modal can
+  // open from pages that never loaded the plan list). #4 + #2.
+  useEffect(() => {
+    if (show) {
+      setSelectedDate(new Date());
+      setMealType("Dinner");
+      setSubmitting(false);
+      if (userId) refetch();
+    }
+  }, [show, userId, refetch]);
 
   const handleSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +65,7 @@ function ScheduleMealModal({ show, onHide, recipeId, recipeName }: Props) {
       return;
     }
 
-    const selectedStr = format(selectedDate, "yyyy-MM-dd");
+    const selectedStr = toDayKey(selectedDate);
 
     // Duplicate pre-check against already-loaded plans (same recipe + day + meal type).
     const plans = mealPlansData?.result?.$values ?? [];
@@ -57,9 +73,8 @@ function ScheduleMealModal({ show, onHide, recipeId, recipeName }: Props) {
       if (p.recipeId !== recipeId) return false;
       if (p.mealType?.toLowerCase() !== mealType.toLowerCase()) return false;
       const dates: string[] = p.dates?.$values ?? p.dates ?? [];
-      return dates.some(
-        (d: string) => format(new Date(d), "yyyy-MM-dd") === selectedStr,
-      );
+      // Compare on the date portion only, ignoring any time/offset the API returns.
+      return dates.some((d: string) => d.slice(0, 10) === selectedStr);
     });
     if (alreadyScheduled) {
       toastNotify(
@@ -69,7 +84,9 @@ function ScheduleMealModal({ show, onHide, recipeId, recipeName }: Props) {
       return;
     }
 
-    const planDateStr = format(selectedDate, "yyyy-MM-dd'T'00:00:00");
+    // Send local-day midnight with no offset so the stored date is exactly the
+    // day the user picked, regardless of the client's timezone.
+    const planDateStr = `${selectedStr}T00:00:00`;
     const payload = {
       planName: `${mealType} - ${recipeName}`,
       mealType,
@@ -125,7 +142,7 @@ function ScheduleMealModal({ show, onHide, recipeId, recipeName }: Props) {
         <Modal.Body>
           <Form.Group className="mb-3">
             <Form.Label className="sm-label">Recipe</Form.Label>
-            <Form.Control type="text" value={recipeName} disabled readOnly />
+            <Form.Control type="text" value={recipeName} disabled />
             <Form.Text className="text-muted">Scheduling this recipe</Form.Text>
           </Form.Group>
           <Form.Group className="mb-3">
@@ -138,7 +155,7 @@ function ScheduleMealModal({ show, onHide, recipeId, recipeName }: Props) {
               className="form-control"
             />
           </Form.Group>
-          <Form.Group className="sm-field">
+          <Form.Group className="mb-3">
             <Form.Label className="sm-label">Meal Category</Form.Label>
             <Form.Select
               value={mealType}
