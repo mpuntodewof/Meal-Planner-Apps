@@ -10,6 +10,7 @@ import userModel from '../../interfaces/userModel';
 import { Roles } from '../../interfaces/enum';
 import { RootState } from '../../redux/store/storeRedux';
 import ScheduleMealModal from '../../components/ScheduleMealModal';
+import toastNotify from '../../helper/toastNotify';
 
 function SingleProduct() {
   const { recipeId } = useParams();
@@ -38,6 +39,17 @@ function SingleProduct() {
   const protein = Number(r.proteinG ?? 0);
   const fat = Number(r.fatG ?? 0);
   const carbs = Number(r.carbsG ?? 0);
+  const isAuthenticated = !!userData.id;
+
+  // Scheduling requires an account. Guests are sent to login instead of the modal.
+  const handleAddToMealPlan = () => {
+    if (!isAuthenticated) {
+      toastNotify("Please log in to add meals to your plan", "error");
+      navigate("/login");
+      return;
+    }
+    setShowSchedule(true);
+  };
 
   return (
     <>
@@ -151,7 +163,7 @@ function SingleProduct() {
                     </div>
                   </div>
 
-                  <a className="bm-btn" style={{ width: "100%", textAlign: "center", marginTop: 14, cursor: "pointer" }} onClick={() => setShowSchedule(true)}>
+                  <a className="bm-btn" style={{ width: "100%", textAlign: "center", marginTop: 14, cursor: "pointer" }} onClick={handleAddToMealPlan}>
                     ＋ Add to Meal Plan
                   </a>
                 </div>
