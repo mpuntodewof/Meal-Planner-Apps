@@ -21,13 +21,13 @@ namespace FoodFestAPI.Helpers
         private string Model => _config["OpenAI:Model"] ?? "gpt-4o-mini";
 
         private const string SystemPrompt =
-            "You are a nutrition estimator. Given a recipe name, serving size, and " +
-            "ingredient list, estimate the nutrition PER SERVING. Respond with ONLY a " +
-            "JSON object (no markdown, no code fences, no prose) of this exact shape: " +
-            "{\"calories\":number,\"proteinG\":number,\"fatG\":number,\"carbsG\":number}. " +
-            "calories is kilocalories per serving; proteinG, fatG, carbsG are grams per " +
-            "serving. Estimate conservatively; if uncertain, give a reasonable midpoint. " +
-            "Never return null — always provide numeric estimates.";
+            "You are a nutrition estimator. Given a recipe name, serving size, and "
+            + "ingredient list, estimate the nutrition PER SERVING. Respond with ONLY a "
+            + "JSON object (no markdown, no code fences, no prose) of this exact shape: "
+            + "{\"calories\":number,\"proteinG\":number,\"fatG\":number,\"carbsG\":number}. "
+            + "calories is kilocalories per serving; proteinG, fatG, carbsG are grams per "
+            + "serving. Estimate conservatively; if uncertain, give a reasonable midpoint. "
+            + "Never return null — always provide numeric estimates.";
 
         public async Task<NutritionResult> EstimateAsync(Recipe recipe)
         {
@@ -41,18 +41,29 @@ namespace FoodFestAPI.Helpers
             try
             {
                 // Compact, structured description of the recipe for the model.
-                var ingredients = recipe.Ingredients?
-                    .Select(i => new { i.Name, i.Unit, i.Description })
+                var ingredients = recipe
+                    .Ingredients?.Select(i => new
+                    {
+                        i.Name,
+                        i.Unit,
+                        i.Description,
+                    })
                     .ToList();
 
-                var userPayload = JsonSerializer.Serialize(new
-                {
-                    name = recipe.Name,
-                    serviceSize = recipe.ServiceSize,
-                    ingredients
-                });
+                var userPayload = JsonSerializer.Serialize(
+                    new
+                    {
+                        name = recipe.Name,
+                        serviceSize = recipe.ServiceSize,
+                        ingredients,
+                    }
+                );
 
-                ChatClient client = OpenAiClientFactory.CreateChatClient(apiKey, Model, _config["OpenAI:BaseUrl"]);
+                ChatClient client = OpenAiClientFactory.CreateChatClient(
+                    apiKey,
+                    Model,
+                    _config["OpenAI:BaseUrl"]
+                );
 
                 List<ChatMessage> messages =
                 [
@@ -87,7 +98,8 @@ namespace FoodFestAPI.Helpers
 
                 var result = JsonSerializer.Deserialize<NutritionResult>(
                     raw,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
 
                 if (result == null)
                 {

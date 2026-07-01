@@ -1,10 +1,10 @@
+using System.Net;
 using FoodFestAPI.Data;
 using FoodFestAPI.Helpers;
 using FoodFestAPI.Models;
 using FoodFestAPI.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace FoodFestAPI.Controllers
 {
@@ -19,7 +19,14 @@ namespace FoodFestAPI.Controllers
         private readonly IAiRecipeService _aiRecipeService;
         private readonly INutritionService _nutritionService;
 
-        public RecipeController(ApplicationDbContext ctx, IConfiguration config, IImageService imgService, ILogger<RecipeController> log, IAiRecipeService aiRecipeService, INutritionService nutritionService)
+        public RecipeController(
+            ApplicationDbContext ctx,
+            IConfiguration config,
+            IImageService imgService,
+            ILogger<RecipeController> log,
+            IAiRecipeService aiRecipeService,
+            INutritionService nutritionService
+        )
         {
             _ctx = ctx;
             _response = new ApiResponse();
@@ -35,7 +42,8 @@ namespace FoodFestAPI.Controllers
         private async Task EstimateAndStoreNutritionAsync(Recipe recipe)
         {
             var nutrition = await _nutritionService.EstimateAsync(recipe);
-            if (nutrition == null) return;
+            if (nutrition == null)
+                return;
 
             recipe.Calories = nutrition.Calories;
             recipe.ProteinG = nutrition.ProteinG;
@@ -50,8 +58,8 @@ namespace FoodFestAPI.Controllers
         {
             try
             {
-                var result = await _ctx.Recipes
-                    .Include(i => i.Ingredients)
+                var result = await _ctx
+                    .Recipes.Include(i => i.Ingredients)
                     .Include(i => i.Instructions)
                     .ToListAsync();
 
@@ -61,42 +69,56 @@ namespace FoodFestAPI.Controllers
 
                 foreach (var item in result)
                 {
-
                     if (item.Ingredients.Count > 0)
                     {
-                        lingredient.Add(new Ingredient
-                        {
-                            Name = item.Ingredients.FirstOrDefault(i => i.RecipeId == item.Id).Name,
-                            Description = item.Ingredients.FirstOrDefault(i => i.RecipeId == item.Id).Description,
-                            RecipeId = item.Id
-                        });
+                        lingredient.Add(
+                            new Ingredient
+                            {
+                                Name = item
+                                    .Ingredients.FirstOrDefault(i => i.RecipeId == item.Id)
+                                    .Name,
+                                Description = item
+                                    .Ingredients.FirstOrDefault(i => i.RecipeId == item.Id)
+                                    .Description,
+                                RecipeId = item.Id,
+                            }
+                        );
                     }
 
                     if (item.Instructions.Count > 0)
                     {
-                        linstructions.Add(new Instructions
-                        {
-                            StepNumber = item.Instructions.FirstOrDefault(i => i.RecipeId == item.Id).StepNumber,
-                            Description = item.Instructions.FirstOrDefault(i => i.RecipeId == item.Id).Description,
-                            RecipeId = item.Id
-                        });
+                        linstructions.Add(
+                            new Instructions
+                            {
+                                StepNumber = item
+                                    .Instructions.FirstOrDefault(i => i.RecipeId == item.Id)
+                                    .StepNumber,
+                                Description = item
+                                    .Instructions.FirstOrDefault(i => i.RecipeId == item.Id)
+                                    .Description,
+                                RecipeId = item.Id,
+                            }
+                        );
                     }
 
-                    lrecipe.Add(new Recipe
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Description = item.Description,
-                        CookingTime = item.CookingTime,
-                        ServiceSize = item.ServiceSize,
-                        ImageUrl = item.ImageUrl,
-                        VideoUrl = item.VideoUrl,
-                        UserId = item.UserId,
-                        CategoriesId = item.CategoriesId,
-                        Ingredients = lingredient,
-                        Instructions = linstructions,
-                    });
-                };
+                    lrecipe.Add(
+                        new Recipe
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            Description = item.Description,
+                            CookingTime = item.CookingTime,
+                            ServiceSize = item.ServiceSize,
+                            ImageUrl = item.ImageUrl,
+                            VideoUrl = item.VideoUrl,
+                            UserId = item.UserId,
+                            CategoriesId = item.CategoriesId,
+                            Ingredients = lingredient,
+                            Instructions = linstructions,
+                        }
+                    );
+                }
+                ;
 
                 _response.StatusCode = HttpStatusCode.OK;
                 _response.Result = result;
@@ -114,7 +136,10 @@ namespace FoodFestAPI.Controllers
         [HttpGet("{id:int}", Name = "GetRecipesByID")]
         public async Task<IActionResult> GetRecipeById(int id)
         {
-            var recipeById = await _ctx.Recipes.Include(i => i.Ingredients).Include(i => i.Instructions).FirstOrDefaultAsync(r => r.Id == id);
+            var recipeById = await _ctx
+                .Recipes.Include(i => i.Ingredients)
+                .Include(i => i.Instructions)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (recipeById == null)
             {
@@ -144,7 +169,13 @@ namespace FoodFestAPI.Controllers
 
                     byte[] byteImg = Convert.FromBase64String(request.ImageUrl);
                     var stream = new MemoryStream(byteImg);
-                    IFormFile fileResult = new FormFile(stream, 0, stream.Length, "name", "fileName");
+                    IFormFile fileResult = new FormFile(
+                        stream,
+                        0,
+                        stream.Length,
+                        "name",
+                        "fileName"
+                    );
                     var imgResult = await _imgService.AddImageAsync(fileResult);
 
                     Recipe recipe = new()
@@ -213,13 +244,18 @@ namespace FoodFestAPI.Controllers
         }
 
         [HttpPost("generate")]
-        public async Task<ActionResult<ApiResponse>> GenerateRecipe([FromBody] GenerateRecipeRequest request)
+        public async Task<ActionResult<ApiResponse>> GenerateRecipe(
+            [FromBody] GenerateRecipeRequest request
+        )
         {
             if (request == null || string.IsNullOrWhiteSpace(request.Prompt))
             {
                 _response.IsSuccess = false;
                 _response.StatusCode = HttpStatusCode.BadRequest;
-                _response.ErrorMessages = new List<string> { "Please enter a description of the recipe you want." };
+                _response.ErrorMessages = new List<string>
+                {
+                    "Please enter a description of the recipe you want.",
+                };
                 return BadRequest(_response);
             }
 
@@ -229,7 +265,10 @@ namespace FoodFestAPI.Controllers
             {
                 _response.IsSuccess = false;
                 _response.StatusCode = HttpStatusCode.InternalServerError;
-                _response.ErrorMessages = new List<string> { "Couldn't generate a recipe right now. Please try again." };
+                _response.ErrorMessages = new List<string>
+                {
+                    "Couldn't generate a recipe right now. Please try again.",
+                };
                 return StatusCode(500, _response);
             }
 
@@ -246,8 +285,8 @@ namespace FoodFestAPI.Controllers
         [HttpPost("{id:int}/estimate-nutrition")]
         public async Task<ActionResult<ApiResponse>> EstimateNutrition(int id)
         {
-            var recipe = await _ctx.Recipes
-                .Include(r => r.Ingredients)
+            var recipe = await _ctx
+                .Recipes.Include(r => r.Ingredients)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (recipe == null)
@@ -263,7 +302,10 @@ namespace FoodFestAPI.Controllers
             {
                 _response.IsSuccess = false;
                 _response.StatusCode = HttpStatusCode.BadGateway;
-                _response.ErrorMessages = new List<string> { "Nutrition estimation is unavailable right now." };
+                _response.ErrorMessages = new List<string>
+                {
+                    "Nutrition estimation is unavailable right now.",
+                };
                 return StatusCode(502, _response);
             }
 
@@ -276,18 +318,21 @@ namespace FoodFestAPI.Controllers
                 recipe.ProteinG,
                 recipe.FatG,
                 recipe.CarbsG,
-                recipe.NutritionEstimatedAt
+                recipe.NutritionEstimatedAt,
             };
             return Ok(_response);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<ApiResponse>> UpdateRecipe([FromBody] RecipeUpdateDTO request, int id)
+        public async Task<ActionResult<ApiResponse>> UpdateRecipe(
+            [FromBody] RecipeUpdateDTO request,
+            int id
+        )
         {
             try
             {
-                var recipe = _ctx.Recipes
-                    .Include(i => i.Ingredients)
+                var recipe = _ctx
+                    .Recipes.Include(i => i.Ingredients)
                     .Include(i => i.Instructions)
                     .FirstOrDefault(r => r.Id == id);
 
@@ -295,7 +340,13 @@ namespace FoodFestAPI.Controllers
                 {
                     byte[] byteImg = Convert.FromBase64String(request.ImageUrl);
                     var stream = new MemoryStream(byteImg);
-                    IFormFile fileResult = new FormFile(stream, 0, stream.Length, "name", "fileName");
+                    IFormFile fileResult = new FormFile(
+                        stream,
+                        0,
+                        stream.Length,
+                        "name",
+                        "fileName"
+                    );
 
                     if (recipe.ImageUrl != null)
                     {
@@ -314,7 +365,9 @@ namespace FoodFestAPI.Controllers
                     recipe.VideoUrl = request.VideoUrl;
                     _ctx.SaveChanges();
 
-                    var ingredients = recipe.Ingredients.Where(i => i.RecipeId == recipe.Id).ToList();
+                    var ingredients = recipe
+                        .Ingredients.Where(i => i.RecipeId == recipe.Id)
+                        .ToList();
                     if (ingredients == null)
                     {
                         foreach (var reqIngredient in request.Ingredient)
@@ -335,7 +388,9 @@ namespace FoodFestAPI.Controllers
                     {
                         foreach (var reqIngredient in request.Ingredient)
                         {
-                            var getIngredient = ingredients.FirstOrDefault(x => x.Id == reqIngredient.Id);
+                            var getIngredient = ingredients.FirstOrDefault(x =>
+                                x.Id == reqIngredient.Id
+                            );
                             if (getIngredient != null)
                             {
                                 getIngredient.Name = reqIngredient.Name;
@@ -352,18 +407,22 @@ namespace FoodFestAPI.Controllers
                                     Description = reqIngredient.Description,
                                     Unit = reqIngredient.Unit,
                                     UpdatedAt = DateTime.Now,
-                                    Recipe = recipe
+                                    Recipe = recipe,
                                 };
 
                                 _ctx.Ingredients.Add(ingredientEntity);
                             }
                         }
-                        var removeIngredients = recipe.Ingredients.Where(i => !request.Ingredient.Any(ui => ui.Id == i.Id)).ToList();
+                        var removeIngredients = recipe
+                            .Ingredients.Where(i => !request.Ingredient.Any(ui => ui.Id == i.Id))
+                            .ToList();
                         _ctx.Ingredients.RemoveRange(removeIngredients);
                         _ctx.SaveChanges();
                     }
 
-                    var instructions = recipe.Instructions.Where(i => i.RecipeId == recipe.Id).ToList();
+                    var instructions = recipe
+                        .Instructions.Where(i => i.RecipeId == recipe.Id)
+                        .ToList();
                     if (instructions == null)
                     {
                         foreach (var insItem in request.Instructions)
@@ -372,7 +431,7 @@ namespace FoodFestAPI.Controllers
                             {
                                 StepNumber = insItem.StepNumber,
                                 Description = insItem.Description,
-                                Recipe = recipe
+                                Recipe = recipe,
                             };
                             _ctx.Instructions.Add(instData);
                         }
@@ -381,7 +440,9 @@ namespace FoodFestAPI.Controllers
                     {
                         foreach (var reqInstruction in request.Instructions)
                         {
-                            var getInstruction = instructions.FirstOrDefault(i => i.Id == reqInstruction.Id);
+                            var getInstruction = instructions.FirstOrDefault(i =>
+                                i.Id == reqInstruction.Id
+                            );
                             if (getInstruction != null)
                             {
                                 getInstruction.StepNumber = reqInstruction.StepNumber;
@@ -394,21 +455,23 @@ namespace FoodFestAPI.Controllers
                                 {
                                     StepNumber = reqInstruction.StepNumber,
                                     Description = reqInstruction.Description,
-                                    Recipe = recipe
+                                    Recipe = recipe,
                                 };
                                 _ctx.Instructions.Add(insModel);
                             }
                         }
 
-                        var removeInstruction = recipe.Instructions.Where(i => !request.Instructions.Any(ui => ui.Id == i.Id)).ToList();
+                        var removeInstruction = recipe
+                            .Instructions.Where(i => !request.Instructions.Any(ui => ui.Id == i.Id))
+                            .ToList();
                         _ctx.Instructions.RemoveRange(removeInstruction);
                         _ctx.SaveChanges();
                     }
 
                     // Ingredients may have changed, so re-estimate nutrition. Reload
                     // the current ingredient set so the estimate reflects the edits.
-                    recipe.Ingredients = await _ctx.Ingredients
-                        .Where(i => i.RecipeId == recipe.Id)
+                    recipe.Ingredients = await _ctx
+                        .Ingredients.Where(i => i.RecipeId == recipe.Id)
                         .ToListAsync();
                     await EstimateAndStoreNutritionAsync(recipe);
 
@@ -441,8 +504,8 @@ namespace FoodFestAPI.Controllers
                 using var transaction = _ctx.Database.BeginTransaction();
                 try
                 {
-                    var recipe = _ctx.Recipes
-                        .Include(i => i.Ingredients)
+                    var recipe = _ctx
+                        .Recipes.Include(i => i.Ingredients)
                         .Include(i => i.Instructions)
                         .FirstOrDefault(r => r.Id == recipeId);
 
@@ -470,6 +533,6 @@ namespace FoodFestAPI.Controllers
             });
 
             return _response;
-        }       
+        }
     }
 }
