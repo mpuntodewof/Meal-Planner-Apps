@@ -1,6 +1,8 @@
+using System.ClientModel;
 using System.Text;
 using System.Text.Json;
 using FoodFestAPI.Models.DTO;
+using OpenAI;
 using OpenAI.Chat;
 
 namespace FoodFestAPI.Helpers
@@ -16,7 +18,9 @@ namespace FoodFestAPI.Helpers
             _log = log;
         }
 
-        private const string Model = "gpt-4o-mini";
+        // Model is config-driven so the provider can be switched via .env without
+        // recompiling. Falls back to OpenAI's gpt-4o-mini when not set.
+        private string Model => _config["OpenAI:Model"] ?? "gpt-4o-mini";
 
         private const string SystemPrompt =
             "You are a recipe author. Given the user's request, produce exactly one complete, " +
@@ -39,7 +43,7 @@ namespace FoodFestAPI.Helpers
 
             try
             {
-                ChatClient client = new(model: Model, apiKey: apiKey);
+                ChatClient client = OpenAiClientFactory.CreateChatClient(apiKey, Model, _config["OpenAI:BaseUrl"]);
 
                 List<ChatMessage> messages =
                 [

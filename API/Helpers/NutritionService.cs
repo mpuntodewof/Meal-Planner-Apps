@@ -17,7 +17,8 @@ namespace FoodFestAPI.Helpers
             _log = log;
         }
 
-        private const string Model = "gpt-4o-mini";
+        // Config-driven so the provider/model can be switched via .env.
+        private string Model => _config["OpenAI:Model"] ?? "gpt-4o-mini";
 
         private const string SystemPrompt =
             "You are a nutrition estimator. Given a recipe name, serving size, and " +
@@ -51,7 +52,7 @@ namespace FoodFestAPI.Helpers
                     ingredients
                 });
 
-                ChatClient client = new(model: Model, apiKey: apiKey);
+                ChatClient client = OpenAiClientFactory.CreateChatClient(apiKey, Model, _config["OpenAI:BaseUrl"]);
 
                 List<ChatMessage> messages =
                 [
