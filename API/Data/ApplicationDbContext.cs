@@ -17,6 +17,7 @@ namespace FoodFestAPI.Data
         public DbSet<UserFavorite> UserFavorites { get; set; }
         public DbSet<MealPlans> MealPlans { get; set; }
         public DbSet<MealPlanDays> MealPlanDays { get; set; }
+        public DbSet<RecipeRating> RecipeRatings { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -30,6 +31,10 @@ namespace FoodFestAPI.Data
                 new Categories { ID = 5, Name = "Lunch" },
                 new Categories { ID = 6, Name = "Snack" }
             );
+
+            builder.Entity<RecipeRating>()
+                .HasIndex(r => new { r.UserId, r.RecipeId })
+                .IsUnique();
         }
     }
 }
