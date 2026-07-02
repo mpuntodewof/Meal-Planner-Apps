@@ -278,10 +278,6 @@ namespace FoodFestAPI.Controllers
             return Ok(_response);
         }
 
-        // Estimates + stores nutrition for an existing recipe on demand. Used to
-        // backfill recipes created before nutrition analysis existed, and callable
-        // by a future background job. Returns the stored nutrition, or 502 if the
-        // estimator was unavailable (recipe is left with null nutrition).
         [HttpPost("{id:int}/estimate-nutrition")]
         public async Task<ActionResult<ApiResponse>> EstimateNutrition(int id)
         {
