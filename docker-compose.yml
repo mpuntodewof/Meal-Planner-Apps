@@ -1,11 +1,8 @@
-version: '3.8'
-
 services:
 
   # ── MySQL Database ───────────────────────────────────────────────────
   db:
     image: mysql:8.0
-    container_name: foodfest-mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -26,7 +23,6 @@ services:
     build:
       context: ./API
       dockerfile: Dockerfile
-    container_name: foodfest-api
     restart: always
     ports:
       - "5128:5128"
@@ -55,7 +51,6 @@ services:
     build:
       context: ./Frontend
       dockerfile: Dockerfile
-    container_name: foodfest-frontend
     restart: always
     ports:
       - "3000:80"
