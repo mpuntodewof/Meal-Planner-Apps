@@ -20,6 +20,19 @@ namespace FoodFestAPI.Models
         public int? CategoriesId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+
+        // AI-estimated nutrition, per serving. Nullable: null means "not yet
+        // analyzed" (existing rows, or an estimation that failed), which the UI
+        // shows honestly rather than as zero. Grams use decimal(6,2).
+        public int? Calories { get; set; }
+        [Column(TypeName = "decimal(6,2)")]
+        public decimal? ProteinG { get; set; }
+        [Column(TypeName = "decimal(6,2)")]
+        public decimal? FatG { get; set; }
+        [Column(TypeName = "decimal(6,2)")]
+        public decimal? CarbsG { get; set; }
+        public DateTime? NutritionEstimatedAt { get; set; }
+
         public Categories Categories { get; set; }
         public AppUser AppUser { get; set; }
 

@@ -23,14 +23,6 @@ function Footer() {
             <p style={{ color: "var(--bm-muted)", marginTop: 8 }}>Curated recipes, meal plans, and food stories.</p>
           </div>
           <div className="col-lg-4 mb-4">
-            <div className="bm-label">Explore</div>
-            <ul style={{ listStyle: "none", padding: 0, marginTop: 8 }}>
-              <li><a style={linkStyle} onClick={() => navigate("/productCatalog")}>Recipes</a></li>
-              <li><a style={linkStyle} onClick={() => navigate("/news")}>News</a></li>
-              <li><a style={linkStyle} onClick={goAbout}>About</a></li>
-            </ul>
-          </div>
-          <div className="col-lg-4 mb-4">
             <div className="bm-label">Newsletter</div>
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
               <input className="form-control" placeholder="Your email" style={{ background: "var(--bm-card)", border: "1px solid var(--bm-border)", color: "var(--bm-text)" }} />

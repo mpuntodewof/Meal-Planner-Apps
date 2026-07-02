@@ -27,4 +27,13 @@ namespace FoodFestAPI.Models.DTO
         public int StepNumber { get; set; }
         public string Description { get; set; }
     }
+
+    // Per-serving nutrition estimate returned by the AI nutrition service.
+    public class NutritionResult
+    {
+        public int Calories { get; set; }
+        public decimal ProteinG { get; set; }
+        public decimal FatG { get; set; }
+        public decimal CarbsG { get; set; }
+    }
 }

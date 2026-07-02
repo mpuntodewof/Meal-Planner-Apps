@@ -36,9 +36,16 @@ services:
       # Tell Kestrel which URL to bind
       - ASPNETCORE_URLS=http://+:5128
       - ASPNETCORE_ENVIRONMENT=Production
-      # OpenAI key for the AI recipe generator — value comes from the gitignored .env file
-      # (docker compose substitutes ${OpenAI__ApiKey}); never hardcode the key here.
+      # AI provider config — values come from the gitignored .env file; never
+      # hardcode secrets here. The services target any OpenAI-compatible provider:
+      #   OpenAI__ApiKey  - provider API key (OpenAI, Groq, Gemini, ...)
+      #   OpenAI__BaseUrl - provider endpoint; empty = OpenAI. Groq is
+      #                     https://api.groq.com/openai/v1
+      #   OpenAI__Model   - model id, e.g. gpt-4o-mini (OpenAI) or
+      #                     llama-3.3-70b-versatile (Groq)
       - OpenAI__ApiKey=${OpenAI__ApiKey:-}
+      - OpenAI__BaseUrl=${OpenAI__BaseUrl:-}
+      - OpenAI__Model=${OpenAI__Model:-gpt-4o-mini}
     depends_on:
       db:
         condition: service_healthy

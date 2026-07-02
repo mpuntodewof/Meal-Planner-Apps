@@ -17,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IAiRecipeService, AiRecipeService>();
+builder.Services.AddScoped<INutritionService, NutritionService>();
 
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
     options.UseMySql(

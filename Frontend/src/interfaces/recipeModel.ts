@@ -14,6 +14,12 @@ export default interface recipeModel {
     createdAt: string;
     updatedAt: string;
     isFavorited: boolean;
+    // AI-estimated per-serving nutrition; null = not yet analyzed.
+    calories?: number | null;
+    proteinG?: number | null;
+    fatG?: number | null;
+    carbsG?: number | null;
+    nutritionEstimatedAt?: string | null;
     ingredients: ingredientModel[];
     instructions: instructionModel[];
 }
