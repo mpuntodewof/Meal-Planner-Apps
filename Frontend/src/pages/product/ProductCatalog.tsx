@@ -10,6 +10,8 @@ import salmon from '../../img/istockphoto-174914813-612x612.jpg';
 import Footer from '../../components/Footer';
 import userModel from '../../interfaces/userModel';
 import favoriteModel from '../../interfaces/favoriteModel';
+import { Rate } from "rsuite";
+import { useGetRatingSummaryQuery } from "../../api/ratingApi";
 
 function ProductCatalog() {
 	const userData: userModel = useSelector(
@@ -33,6 +35,12 @@ function ProductCatalog() {
 			setFavorites(data.result.favoriteRecipes.$values);
 		}
 	}, [data, isLoading]);
+
+	const recipeIds = (favorites ?? []).map((f: any) => f.recipeId);
+	const { data: ratingSummaryResp } = useGetRatingSummaryQuery(recipeIds, {
+		skip: recipeIds.length === 0,
+	});
+	const ratingSummaries: any[] = ratingSummaryResp?.result ?? [];
 
 	const favData = useMemo(() => ({
 		favoriteDTOs:
@@ -142,6 +150,15 @@ function ProductCatalog() {
 												</div>
 												<div style={{ padding: 16 }}>
 													<h3 style={{ fontSize: 18, fontWeight: 700, minHeight: 50 }}>{fav.recipeName}</h3>
+													{(() => {
+														const s = ratingSummaries.find((x) => x.recipeId === fav.recipeId);
+														return (
+															<span className="bm-stars" style={{ fontSize: 13, display: "inline-flex", alignItems: "center", gap: 4 }}>
+																<Rate value={s?.average ?? 0} max={5} size="xs" readOnly />
+																{s?.count ? `${s.average} (${s.count})` : ""}
+															</span>
+														);
+													})()}
 													<p style={{ color: "var(--bm-faint)", fontSize: 13 }}>
 														<i className="fas fa-calendar"></i> {fav.createdAt && new Date(fav.createdAt).toLocaleDateString()}
 													</p>

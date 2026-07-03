@@ -6,6 +6,8 @@ import { Loader } from '../../components/sub-comp';
 import { useDispatch } from 'react-redux';
 import { setRecipe } from '../../redux/reducerAction/recipeSlice';
 import imgDef from '../../img/istockphoto-174914813-612x612.jpg';
+import { Rate } from "rsuite";
+import { useGetRatingSummaryQuery } from "../../api/ratingApi";
 
 function Product() {
 	const [recipes, setRecipes] = useState<recipeModel[]>([]);
@@ -19,6 +21,12 @@ function Product() {
 			setRecipes(data.result?.$values ?? []);
 		}
 	}, [isLoading, data]);
+
+	const recipeIds = (recipes ?? []).map((r: any) => r.id);
+	const { data: ratingSummaryResp } = useGetRatingSummaryQuery(recipeIds, {
+		skip: recipeIds.length === 0,
+	});
+	const ratingSummaries: any[] = ratingSummaryResp?.result ?? [];
 
 	console.log(recipes);
 
@@ -57,6 +65,15 @@ function Product() {
 										</a>
 									</div>
 									<h3 style={{ textWrap: 'wrap', padding: '10px', height: 70, alignContent: 'center' }}>{recipe.name}</h3>
+									{(() => {
+										const s = ratingSummaries.find((x) => x.recipeId === recipe.id);
+										return (
+											<span className="bm-stars" style={{ fontSize: 13, display: "inline-flex", alignItems: "center", gap: 4 }}>
+												<Rate value={s?.average ?? 0} max={5} size="xs" readOnly />
+												{s?.count ? `${s.average} (${s.count})` : ""}
+											</span>
+										);
+									})()}
 									<p
 										className="product-price p-4"
 									>
