@@ -35,6 +35,14 @@ namespace FoodFestAPI.Data
             builder.Entity<RecipeRating>()
                 .HasIndex(r => new { r.UserId, r.RecipeId })
                 .IsUnique();
+
+            // MealPlanDays.MealPlanId is the real FK to MealPlans; without this the
+            // convention invents an unpopulated shadow FK (MealPlansId) and the
+            // MealPlanDays.MealPlans navigation never resolves. Bind it explicitly.
+            builder.Entity<MealPlanDays>()
+                .HasOne(d => d.MealPlans)
+                .WithMany(m => m.MealPlanDays)
+                .HasForeignKey(d => d.MealPlanId);
         }
     }
 }
