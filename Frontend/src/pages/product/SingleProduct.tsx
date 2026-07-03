@@ -44,7 +44,7 @@ function SingleProduct() {
   const [rateRecipe] = useRateRecipeMutation();
 
   const myStars = myRatingResp?.result?.stars ?? 0;
-  const ratingSummary = summaryResp?.result?.find(
+  const ratingSummary = (summaryResp?.result?.$values ?? []).find(
     (s: any) => s.recipeId === numericRecipeId
   );
   const avgRating = ratingSummary?.average ?? 0;

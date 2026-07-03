@@ -40,7 +40,7 @@ function ProductCatalog() {
 	const { data: ratingSummaryResp } = useGetRatingSummaryQuery(recipeIds, {
 		skip: recipeIds.length === 0,
 	});
-	const ratingSummaries: any[] = ratingSummaryResp?.result ?? [];
+	const ratingSummaries: any[] = ratingSummaryResp?.result?.$values ?? [];
 
 	const favData = useMemo(() => ({
 		favoriteDTOs:
