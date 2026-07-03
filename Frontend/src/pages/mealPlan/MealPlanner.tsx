@@ -13,14 +13,18 @@ import { useGetMealPlansQuery, useCreateMealPlanMutation, useDeleteMealPlanMutat
 import { useGetRecipesQuery } from '../../api/recipeApi';
 import toastNotify from '../../helper/toastNotify';
 import withAuth from '../../HOC/withAuth';
+import ShoppingList from './ShoppingList';
 
 function MealPlanner() {
     const [currDate, setCurrDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [showList, setShowList] = useState(false);
 
     const startCurrWeek = startOfWeek(currDate, { weekStartsOn: 0 });
     const endCurrWeek = endOfWeek(currDate, { weekStartsOn: 0 });
     const formattedRange = `${format(startCurrWeek, "MMMM d")} - ${format(endCurrWeek, "MMMM d, yyyy")}`;
+    const rangeStart = format(startCurrWeek, "yyyy-MM-dd");
+    const rangeEnd = format(endCurrWeek, "yyyy-MM-dd");
 
     const goToNextWeek = () => {
         const nextWeek = addDays(currDate, 7);
@@ -292,6 +296,24 @@ function MealPlanner() {
                                     })}
                                 </ul>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Shopping List */}
+                    <div className="row justify-content-center mb-4">
+                        <div className="col-lg-8 col-md-10 text-center">
+                            <Button
+                                variant="outline-secondary"
+                                style={{ borderColor: '#F28123', color: '#F28123' }}
+                                onClick={() => setShowList((v) => !v)}
+                            >
+                                {showList ? "Hide shopping list" : "Generate shopping list"}
+                            </Button>
+                            {showList && (
+                                <div className="mt-3 text-left">
+                                    <ShoppingList userId={userId ?? ""} start={rangeStart} end={rangeEnd} />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
