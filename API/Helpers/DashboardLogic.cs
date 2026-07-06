@@ -56,5 +56,19 @@ namespace FoodFestAPI.Helpers
             }
             return result;
         }
+
+        // A single human sentence summarizing the dominant behavior. Empty string when
+        // there is no data (caller shows an empty state instead).
+        public static string BuildInsightLine(DashboardSummaryDTO s, string topSlot, int topSlotPct)
+        {
+            if (s.TotalMealsPlanned <= 0 || string.IsNullOrEmpty(topSlot)) return "";
+            var varietyClause = s.VarietyBand switch
+            {
+                "Low" => " and your recipe variety is low — you keep repeating the same meals",
+                "High" => " with high recipe variety",
+                _ => " with balanced recipe variety",
+            };
+            return $"{topSlot} is {topSlotPct}% of your plans{varietyClause}.";
+        }
     }
 }
