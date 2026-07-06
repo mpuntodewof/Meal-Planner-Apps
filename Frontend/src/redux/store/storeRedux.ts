@@ -10,6 +10,7 @@ import favoriteApi from "../../api/favoriteApi";
 import mealPlanApi from "../../api/mealPlanApi";
 import ratingApi from "../../api/ratingApi";
 import shoppingListApi from "../../api/shoppingListApi";
+import dashboardApi from "../../api/dashboardApi";
 import storage from 'redux-persist/lib/storage';
 
 const persistConfig = {
@@ -36,6 +37,7 @@ const storeRedux = configureStore({
         [mealPlanApi.reducerPath]: mealPlanApi.reducer,
         [ratingApi.reducerPath]: ratingApi.reducer,
         [shoppingListApi.reducerPath]: shoppingListApi.reducer,
+        [dashboardApi.reducerPath]: dashboardApi.reducer,
         persistedReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
@@ -45,7 +47,8 @@ const storeRedux = configureStore({
         .concat(favoriteApi.middleware)
         .concat(mealPlanApi.middleware)
         .concat(ratingApi.middleware)
-        .concat(shoppingListApi.middleware),
+        .concat(shoppingListApi.middleware)
+        .concat(dashboardApi.middleware),
 });
 
 export const persistor = persistStore(storeRedux);
