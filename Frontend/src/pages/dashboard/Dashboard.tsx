@@ -160,7 +160,7 @@ const Dashboard: React.FC = () => {
               spark={kcalSpark}
             />
 
-            <div className="card col-8">
+            <div className="ds-card ds-col-8">
               <h3>Meals planned per week, by slot</h3>
               <div className="sub">Stacked from MealPlanDays.Date × MealType</div>
               <div className="scroll-x"><StackedWeeklyChart weekly={weekly} /></div>
@@ -172,19 +172,19 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="card col-4">
+            <div className="ds-card ds-col-4">
               <h3>Category mix</h3>
               <div className="sub">What you gravitate toward</div>
               <CategoryDonut data={categoryMix} />
             </div>
 
-            <div className="card col-6">
+            <div className="ds-card ds-col-6">
               <h3>Your most-planned recipes</h3>
               <div className="sub">Repetition is the variety story, told plainly</div>
               <TopRecipesBar data={topRecipes} />
             </div>
 
-            <div className="card col-6">
+            <div className="ds-card ds-col-6">
               <h3>Planned nutrition drift</h3>
               <div className="sub">Avg kcal/serving of planned meals · null-nutrition recipes excluded</div>
               <NutritionTrendLine weekly={weekly} />

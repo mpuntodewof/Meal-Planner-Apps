@@ -13,7 +13,7 @@ interface Props {
 const KpiTile: React.FC<Props> = ({ label, value, delta, deltaKind = "flat", spark, empty, emptyText }) => {
   if (empty) {
     return (
-      <div className="kpi">
+      <div className="ds-kpi">
         <div className="label">{label}</div>
         <div className="val" style={{ color: "var(--muted)" }}>—</div>
         <div className="delta flat">{emptyText ?? "No data yet"}</div>
@@ -21,7 +21,7 @@ const KpiTile: React.FC<Props> = ({ label, value, delta, deltaKind = "flat", spa
     );
   }
   return (
-    <div className="kpi">
+    <div className="ds-kpi">
       <div className="label">{label}</div>
       <div className="val">{value}</div>
       {delta && <div className={`delta ${deltaKind}`}>{delta}</div>}

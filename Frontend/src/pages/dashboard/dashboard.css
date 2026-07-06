@@ -13,9 +13,9 @@
   --plane:#0c0c0b;--surface:#1a1a18;--ink:#f6f4ec;--ink-2:#b9b6ab;--muted:#8f8c82;--grid:#2b2b28;--baseline:#3a3a36;--border:rgba(255,255,255,0.10);
   --s1:#3987e5;--s2:#22b884;--s3:#e9ab2a;--s4:#e66767;--s5:#9085e9;--s6:#ef7a4a;--good:#2fbf2f; }
 
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
-.card h3 { margin: 0 0 2px; font-size: 14px; font-weight: 700; white-space: nowrap; }
-.card .sub { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+.ds-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+.ds-card h3 { margin: 0 0 2px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.ds-card .sub { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
 .legend { display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 14px; font-size: 12.5px; color: var(--ink-2); }
 .legend span { display: inline-flex; align-items: center; gap: 7px; }
 .swatch { width: 11px; height: 11px; border-radius: 3px; }
@@ -24,34 +24,34 @@
    align-items: stretch). Make each card a flex column so its plot area fills the
    card, and vertically center the SVG so it never floats with dead space. NOT
    applied to .kpi tiles. */
-.metric-grid > .card { display: flex; flex-direction: column; }
-.metric-grid > .card .scroll-x { flex: 1; display: flex; align-items: center; min-height: 0; }
+.metric-grid > .ds-card { display: flex; flex-direction: column; }
+.metric-grid > .ds-card .scroll-x { flex: 1; display: flex; align-items: center; min-height: 0; }
 /* A direct-child chart (donut / bars / line) fills the remaining space and
    centers. The SVG keeps its aspect ratio via viewBox, so it scales up to fill
    the card the way the concept's charts do. */
-.metric-grid > .card > .chart { flex: 1; min-height: 0; margin: auto; max-height: 300px; }
-.metric-grid > .card .scroll-x > .chart { max-height: 260px; }
+.metric-grid > .ds-card > .chart { flex: 1; min-height: 0; margin: auto; max-height: 300px; }
+.metric-grid > .ds-card .scroll-x > .chart { max-height: 260px; }
 .axis-label { fill: var(--muted); font-size: 11px; }
 .bar-label { fill: var(--ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .value-lg { fill: var(--ink); font-weight: 700; }
 .scroll-x { overflow-x: auto; }
 
 .metric-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
-.kpi { grid-column: span 3; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
-.kpi .label { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .02em; text-transform: uppercase; }
-.kpi .val { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 8px 0 2px; font-variant-numeric: tabular-nums; }
-.kpi .delta { font-size: 12.5px; font-weight: 600; }
-.kpi .delta.up { color: var(--good); }
-.kpi .delta.flat { color: var(--muted); }
+.ds-kpi { grid-column: span 3; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+.ds-kpi .label { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .02em; text-transform: uppercase; }
+.ds-kpi .val { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 8px 0 2px; font-variant-numeric: tabular-nums; }
+.ds-kpi .delta { font-size: 12.5px; font-weight: 600; }
+.ds-kpi .delta.up { color: var(--good); }
+.ds-kpi .delta.flat { color: var(--muted); }
 .spark { display:flex; gap:2px; height:26px; align-items:flex-end; margin-top:10px; }
 .spark i { flex:1; background: color-mix(in srgb, var(--s1) 55%, transparent); border-radius:2px 2px 0 0; }
-.col-6 { grid-column: span 6; } .col-4 { grid-column: span 4; } .col-8 { grid-column: span 8; } .col-12 { grid-column: span 12; }
+.ds-col-6 { grid-column: span 6; } .ds-col-4 { grid-column: span 4; } .ds-col-8 { grid-column: span 8; } .ds-col-12 { grid-column: span 12; }
 /* Keep the multi-column cockpit layout intact until the viewport is genuinely
    narrow (also forgiving of browser zoom). KPIs drop to 2-across first, then
    everything stacks. */
-@media (max-width: 900px) { .kpi { grid-column: span 6; } }
-@media (max-width: 680px) { .kpi { grid-column: span 6; } .col-6,.col-4,.col-8 { grid-column: span 12; } }
-@media (max-width: 460px) { .kpi { grid-column: span 12; } }
+@media (max-width: 900px) { .ds-kpi { grid-column: span 6; } }
+@media (max-width: 680px) { .ds-kpi { grid-column: span 6; } .ds-col-6,.ds-col-4,.ds-col-8 { grid-column: span 12; } }
+@media (max-width: 460px) { .ds-kpi { grid-column: span 12; } }
 
 .ds-empty { text-align:center; padding:24px 12px; color:var(--muted); }
 .ds-empty p { margin:0 0 12px; font-size:13px; }
