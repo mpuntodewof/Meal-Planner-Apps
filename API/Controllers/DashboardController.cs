@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net;
 using FoodFestAPI.Data;
 using FoodFestAPI.Helpers;
@@ -54,6 +55,44 @@ namespace FoodFestAPI.Controllers
 
             var summary = DashboardLogic.BuildSummary(plans, ratings, windowStart, weeks);
             _response.Result = summary;
+            _response.StatusCode = HttpStatusCode.OK;
+            _response.IsSuccess = true;
+            return Ok(_response);
+        }
+
+        // GET api/dashboard/admin?weeks=6
+        // Platform-wide aggregate across all users. NOTE: not role-gated yet
+        // (matches existing unprotected controllers — see plan Task 9).
+        [HttpGet("admin")]
+        public async Task<ActionResult<ApiResponse>> GetAdminDashboard(int weeks = DefaultWeeks)
+        {
+            if (weeks < 1 || weeks > 52) weeks = DefaultWeeks;
+
+            var windowStart = DateTime.UtcNow.Date.AddDays(-7 * (weeks - 1));
+            var windowEnd = windowStart.AddDays(7 * weeks);
+
+            var plans = await _ctx.MealPlans
+                .Include(m => m.MealPlanDays)
+                .Include(m => m.Recipe)
+                .ToListAsync();
+
+            var ratings = await _ctx.RecipeRatings.ToListAsync();
+
+            var baseSummary = DashboardLogic.BuildSummary(plans, ratings, windowStart, weeks);
+
+            // Weekly active = distinct users with a plan day in the window.
+            var weeklyActive = plans
+                .Where(p => (p.MealPlanDays ?? new List<MealPlanDays>())
+                    .Any(d => d.Date >= windowStart && d.Date < windowEnd))
+                .Select(p => p.UserID)
+                .Distinct()
+                .Count();
+
+            var recipesCreated = await _ctx.Recipes.CountAsync(r => r.CreatedAt >= windowStart);
+            var newUsers = await _ctx.AppUsers.CountAsync(u => u.CreatedAt >= windowStart);
+
+            var admin = DashboardLogic.ToAdmin(baseSummary, weeklyActive, recipesCreated, newUsers);
+            _response.Result = admin;
             _response.StatusCode = HttpStatusCode.OK;
             _response.IsSuccess = true;
             return Ok(_response);

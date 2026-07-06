@@ -117,6 +117,36 @@ namespace FoodFestAPI.Helpers
             summary.HasData = true;
             return summary;
         }
+
+        // Wraps a base summary into the admin DTO with platform-level counts.
+        public static AdminDashboardDTO ToAdmin(
+            DashboardSummaryDTO b, int weeklyActive, int recipesCreated, int newUsers)
+        {
+            return new AdminDashboardDTO
+            {
+                TotalMealsPlanned = b.TotalMealsPlanned,
+                UniqueRecipes = b.UniqueRecipes,
+                VarietyScore = b.VarietyScore,
+                VarietyBand = b.VarietyBand,
+                AvgRating = b.AvgRating,
+                RatingCount = b.RatingCount,
+                AvgCalories = b.AvgCalories,
+                AvgProteinG = b.AvgProteinG,
+                AvgFatG = b.AvgFatG,
+                AvgCarbsG = b.AvgCarbsG,
+                RecipesPlanned = b.RecipesPlanned,
+                RecipesWithNutrition = b.RecipesWithNutrition,
+                Weekly = b.Weekly,
+                CategoryMix = b.CategoryMix,
+                TopRecipes = b.TopRecipes,
+                InsightLine = b.InsightLine,
+                HasData = b.HasData,
+                WeeklyActiveUsers = weeklyActive,
+                RecipesCreated = recipesCreated,
+                NewUsers = newUsers,
+            };
+        }
+
         // Ratio of distinct recipes to total plans, banded for humans.
         // < 0.5 Low, 0.5..0.75 Balanced, > 0.75 High. Empty => Low.
         public static string VarietyBand(int uniqueRecipes, int totalPlans)
