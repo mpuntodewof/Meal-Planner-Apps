@@ -26,8 +26,14 @@ namespace FoodFestAPI.Helpers
         {
             var summary = new DashboardSummaryDTO();
 
+            // Every metric derives from this windowed list so headline totals, the
+            // Weekly series, and the InsightLine all describe the SAME population.
+            // Days outside [windowStart, windowStart + weeks*7) are dropped up front,
+            // even for plans that straddle the window boundary.
+            var windowEnd = windowStart.Date.AddDays(7 * weeks);
             var meals = plans
                 .SelectMany(p => (p.MealPlanDays ?? new List<MealPlanDays>())
+                    .Where(d => d.Date.Date >= windowStart.Date && d.Date.Date < windowEnd)
                     .Select(d => new { d.Date, p.MealType, p.Recipe }))
                 .ToList();
 
@@ -38,19 +44,27 @@ namespace FoodFestAPI.Helpers
                 return summary; // HasData stays false
             }
 
-            var distinctRecipes = plans.Select(p => p.RecipeId).Distinct().Count();
+            var distinctRecipes = meals
+                .Where(m => m.Recipe != null)
+                .Select(m => m.Recipe!.Id)
+                .Distinct()
+                .Count();
             summary.UniqueRecipes = distinctRecipes;
             summary.VarietyScore = Math.Round((double)distinctRecipes / summary.TotalMealsPlanned, 2);
             summary.VarietyBand = VarietyBand(distinctRecipes, summary.TotalMealsPlanned);
 
+            // Ratings are not day-scoped, so they are NOT window-filtered: all of the
+            // user's ratings contribute to AvgRating/RatingCount.
             if (ratings.Count > 0)
             {
                 summary.AvgRating = Math.Round(ratings.Average(r => r.Stars), 1);
                 summary.RatingCount = ratings.Count;
             }
 
-            var plannedRecipes = plans.Where(p => p.Recipe != null).Select(p => p.Recipe!).ToList();
-            var distinctPlannedRecipes = plannedRecipes
+            // Distinct planned recipes derived from the windowed meals (nutrition denominator).
+            var distinctPlannedRecipes = meals
+                .Where(m => m.Recipe != null)
+                .Select(m => m.Recipe!)
                 .GroupBy(r => r.Id).Select(g => g.First()).ToList();
             summary.RecipesPlanned = distinctPlannedRecipes.Count;
             var analyzed = distinctPlannedRecipes.Where(r => r.Calories.HasValue).ToList();

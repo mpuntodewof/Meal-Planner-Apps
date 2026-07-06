@@ -46,6 +46,27 @@ public class BuildSummaryTests
     }
 
     [Fact]
+    public void BuildSummary_ExcludesOutOfWindowDays()
+    {
+        var windowStart = DateTime.UtcNow.Date.AddDays(-35); // 6-week window: [-35, +7)
+        var rendang = R(1, "Beef Rendang", 600, 4);
+
+        var plans = new List<MealPlans>
+        {
+            new() { Id = 1, MealType = "Dinner", RecipeId = 1, Recipe = rendang,
+                    MealPlanDays = new List<MealPlanDays> { new() { Date = windowStart.AddDays(1) } } },
+            new() { Id = 2, MealType = "Dinner", RecipeId = 1, Recipe = rendang,
+                    MealPlanDays = new List<MealPlanDays> { new() { Date = windowStart.AddDays(-40) } } },
+        };
+
+        var s = DashboardLogic.BuildSummary(plans, new(), windowStart, weeks: 6);
+
+        Assert.Equal(1, s.TotalMealsPlanned);
+        Assert.Equal(1, s.UniqueRecipes);
+        Assert.Contains("100%", s.InsightLine);
+    }
+
+    [Fact]
     public void BuildSummary_EmptyWhenNoPlans()
     {
         var s = DashboardLogic.BuildSummary(new(), new(), DateTime.UtcNow.Date, weeks: 6);

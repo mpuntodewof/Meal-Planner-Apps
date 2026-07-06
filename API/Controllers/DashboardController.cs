@@ -33,12 +33,19 @@ namespace FoodFestAPI.Controllers
                 return BadRequest(_response);
             }
 
-            var windowStart = DateTime.UtcNow.Date.AddDays(-7 * (weeks - 1));
+            if (weeks < 1 || weeks > 52) weeks = DefaultWeeks;
 
+            var windowStart = DateTime.UtcNow.Date.AddDays(-7 * (weeks - 1));
+            var windowEnd = windowStart.AddDays(7 * weeks);
+
+            // Efficiency guard: only pull plans with at least one day in the window.
+            // BuildSummary re-applies the window per day, so boundary-straddling plans
+            // are still trimmed correctly there.
             var plans = await _ctx.MealPlans
                 .Include(m => m.MealPlanDays)
                 .Include(m => m.Recipe)
-                .Where(m => m.UserID == userId)
+                .Where(m => m.UserID == userId
+                    && m.MealPlanDays.Any(d => d.Date >= windowStart && d.Date < windowEnd))
                 .ToListAsync();
 
             var ratings = await _ctx.RecipeRatings
