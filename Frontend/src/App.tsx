@@ -18,6 +18,7 @@ import UserProfile from './pages/auth/UserProfile';
 import MealPlanner from './pages/mealPlan/MealPlanner';
 import News from './pages/news/News';
 import NewsArticle from './pages/news/NewsArticle';
+import Dashboard from './pages/dashboard/Dashboard';
 
 function App() {
   const dispatch = useDispatch();
@@ -47,6 +48,8 @@ function App() {
           <Route path="/news/:id" element={<NewsArticle />} />
 
           <Route path="/mealPlan" element={<MealPlanner />} />
+
+          <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/login" element={
             <>
