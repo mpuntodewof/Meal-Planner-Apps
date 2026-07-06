@@ -14,12 +14,23 @@
   --s1:#3987e5;--s2:#22b884;--s3:#e9ab2a;--s4:#e66767;--s5:#9085e9;--s6:#ef7a4a;--good:#2fbf2f; }
 
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
-.card h3 { margin: 0 0 2px; font-size: 14px; font-weight: 700; }
+.card h3 { margin: 0 0 2px; font-size: 14px; font-weight: 700; white-space: nowrap; }
 .card .sub { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
 .legend { display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 14px; font-size: 12.5px; color: var(--ink-2); }
 .legend span { display: inline-flex; align-items: center; gap: 7px; }
 .swatch { width: 11px; height: 11px; border-radius: 3px; }
 .chart { width: 100%; height: auto; display: block; overflow: visible; }
+/* Chart cards: grid already makes cards in the same row equal-height (default
+   align-items: stretch). Make each card a flex column so its plot area fills the
+   card, and vertically center the SVG so it never floats with dead space. NOT
+   applied to .kpi tiles. */
+.metric-grid > .card { display: flex; flex-direction: column; }
+.metric-grid > .card .scroll-x { flex: 1; display: flex; align-items: center; min-height: 0; }
+/* A direct-child chart (donut / bars / line) fills the remaining space and
+   centers. The SVG keeps its aspect ratio via viewBox, so it scales up to fill
+   the card the way the concept's charts do. */
+.metric-grid > .card > .chart { flex: 1; min-height: 0; margin: auto; max-height: 300px; }
+.metric-grid > .card .scroll-x > .chart { max-height: 260px; }
 .axis-label { fill: var(--muted); font-size: 11px; }
 .bar-label { fill: var(--ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .value-lg { fill: var(--ink); font-weight: 700; }
@@ -35,19 +46,34 @@
 .spark { display:flex; gap:2px; height:26px; align-items:flex-end; margin-top:10px; }
 .spark i { flex:1; background: color-mix(in srgb, var(--s1) 55%, transparent); border-radius:2px 2px 0 0; }
 .col-6 { grid-column: span 6; } .col-4 { grid-column: span 4; } .col-8 { grid-column: span 8; } .col-12 { grid-column: span 12; }
-@media (max-width: 860px) { .kpi { grid-column: span 6; } .col-6,.col-4,.col-8 { grid-column: span 12; } }
-@media (max-width: 520px) { .kpi { grid-column: span 12; } }
+/* Keep the multi-column cockpit layout intact until the viewport is genuinely
+   narrow (also forgiving of browser zoom). KPIs drop to 2-across first, then
+   everything stacks. */
+@media (max-width: 900px) { .kpi { grid-column: span 6; } }
+@media (max-width: 680px) { .kpi { grid-column: span 6; } .col-6,.col-4,.col-8 { grid-column: span 12; } }
+@media (max-width: 460px) { .kpi { grid-column: span 12; } }
 
 .ds-empty { text-align:center; padding:24px 12px; color:var(--muted); }
 .ds-empty p { margin:0 0 12px; font-size:13px; }
 .ds-empty-cta { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:8px 16px; font-weight:600; font-size:13px; cursor:pointer; }
 .ds-insight { font-family:var(--display, Georgia, serif); font-size:clamp(18px,2.4vw,24px); line-height:1.35; color:var(--ink); margin:0 0 20px; padding:16px 20px; background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:12px; }
 
-.dashboard-root { max-width:1180px; margin:0 auto; padding:32px 28px 80px; font-family:var(--sans, "Segoe UI", system-ui, sans-serif); }
-.ds-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:22px; flex-wrap:wrap; }
+.dashboard-root { max-width:1180px; margin:0 auto; padding:40px 28px 80px; font-family:var(--sans, "Segoe UI", system-ui, sans-serif); }
+
+/* Masthead — mirrors the concept's kicker + serif title + lead + amber data note */
+.ds-masthead { margin-bottom:24px; }
 .ds-kicker { font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); font-weight:700; }
-.ds-title { font-family:var(--display, Georgia, serif); font-weight:400; font-size:clamp(24px,4vw,36px); margin:8px 0 0; }
-.ds-loading { color:var(--muted); padding:40px 0; }
-.roletoggle { display:inline-flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px; }
+.ds-title { font-family:var(--display, Georgia, serif); font-weight:400; font-size:clamp(28px,4vw,44px); letter-spacing:-.01em; margin:10px 0 8px; }
+.ds-lead { color:var(--ink-2); max-width:640px; line-height:1.55; margin:0; font-size:15px; }
+.ds-note { font-size:13px; color:var(--muted); margin-top:14px; padding:12px 16px; border-left:3px solid var(--s3); background:color-mix(in srgb, var(--s3) 8%, transparent); border-radius:0 8px 8px 0; line-height:1.5; }
+.ds-note b { color:var(--ink); }
+
+/* Controls row */
+.ds-controls { display:flex; align-items:center; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
+.ds-btn { display:inline-flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--border); color:var(--ink-2); font-family:inherit; font-size:12.5px; font-weight:600; padding:8px 16px; border-radius:999px; cursor:pointer; transition:background .15s ease, color .15s ease; }
+.ds-btn:hover { color:var(--ink); }
+.ds-loading { color:var(--muted); padding:48px 0; text-align:center; font-size:14px; }
+.ds-linkbtn { background:none; border:0; color:var(--accent); font:inherit; font-weight:600; cursor:pointer; padding:0; text-decoration:underline; }
+.roletoggle { display:inline-flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px; margin-left:auto; }
 .roletoggle button { font-family:inherit; font-size:12.5px; font-weight:600; border:0; background:transparent; color:var(--muted); padding:8px 16px; border-radius:999px; cursor:pointer; }
 .roletoggle button[aria-pressed="true"] { background:var(--accent); color:#fff; }
