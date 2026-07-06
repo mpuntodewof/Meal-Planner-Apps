@@ -24,8 +24,8 @@ const CategoryDonut: React.FC<{ data: NameCount[] }> = ({ data }) => {
   return (
     <svg className="chart" viewBox="0 0 220 220" role="img" aria-label="Recipe category mix">
       {arcs}
-      <text x={cx} y={cy - 2} textAnchor="middle" className="value-lg" fontSize="22" fill="var(--ink)">{top.name}</text>
-      <text x={cx} y={cy + 16} textAnchor="middle" className="axis-label">{Math.round((top.count / total) * 100)}% · top</text>
+      <text x={cx} y={cy} textAnchor="middle" className="value-lg" fontSize="20" fill="var(--ink)">{top.name}</text>
+      <text x={cx} y={cy + 18} textAnchor="middle" className="axis-label" fontSize="12">{Math.round((top.count / total) * 100)}% · top</text>
     </svg>
   );
 };

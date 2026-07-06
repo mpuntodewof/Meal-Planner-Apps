@@ -12,6 +12,9 @@ const StackedWeeklyChart: React.FC<{ weekly: WeeklyPoint[] }> = ({ weekly }) => 
   const W = 620, H = 240, padL = 34, padB = 28, padT = 10, padR = 10;
   const max = Math.max(6, ...weekly.map((w) => w.totalMeals));
   const bw = (W - padL - padR) / weekly.length;
+  // Cap the bar width so a single populated week reads as a slim column rather
+  // than a chunky square block. Bars stay centered in their weekly slot.
+  const bwidth = Math.min(bw * 0.56, 38);
   const ph = H - padB - padT;
   const ticks = [0, 1, 2, 3].map((g) => ({ y: padT + ph - (ph * g) / 3, v: Math.round((max * g) / 3) }));
 
@@ -24,8 +27,7 @@ const StackedWeeklyChart: React.FC<{ weekly: WeeklyPoint[] }> = ({ weekly }) => 
         </g>
       ))}
       {weekly.map((w, i) => {
-        const x = padL + i * bw + bw * 0.22;
-        const bwidth = bw * 0.56;
+        const x = padL + i * bw + (bw - bwidth) / 2; // center the bar in its slot
         let y0 = padT + ph;
         const vals = KEYS.map((k) => w[k] as number);
         return (
