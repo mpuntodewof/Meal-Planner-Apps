@@ -42,6 +42,12 @@ services:
       - OpenAI__ApiKey=${OpenAI__ApiKey:-}
       - OpenAI__BaseUrl=${OpenAI__BaseUrl:-}
       - OpenAI__Model=${OpenAI__Model:-gpt-4o-mini}
+      # Ordered, comma-separated fallback chain (first = primary). If set, overrides
+      # OpenAI__Model. On 429/402/5xx the next model is tried automatically.
+      - OpenAI__Models=${OpenAI__Models:-}
+      # OpenRouter attribution (optional; shown in OpenRouter dashboard/rankings).
+      - OpenAI__Referer=${OpenAI__Referer:-}
+      - OpenAI__Title=${OpenAI__Title:-}
     depends_on:
       db:
         condition: service_healthy
