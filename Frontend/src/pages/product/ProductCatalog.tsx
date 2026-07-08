@@ -31,8 +31,11 @@ function ProductCatalog() {
 
 	useEffect(() => {
 		if (!isLoading && userData.id != null) {
-			dispatch(setFavorite(data.result.favoriteRecipes.$values));
-			setFavorites(data.result.favoriteRecipes.$values);
+			// Guard against undefined `data` (first load) and `result: null`
+			// (API error responses) so an API failure doesn't crash the page.
+			const favoriteRecipes = data?.result?.favoriteRecipes?.$values ?? [];
+			dispatch(setFavorite(favoriteRecipes));
+			setFavorites(favoriteRecipes);
 		}
 	}, [data, isLoading]);
 

@@ -204,9 +204,11 @@ function SingleProduct() {
                       ) : (
                         <Rate value={avgRating} max={5} size="sm" readOnly />
                       )}
-                      <span style={{ color: "var(--bm-faint)", fontSize: 13 }}>
-                        {ratingCount > 0 ? `${avgRating} (${ratingCount})` : "No ratings yet"}
-                      </span>
+                      {ratingCount > 0 && (
+                        <span style={{ color: "var(--bm-faint)", fontSize: 13 }}>
+                          {`${avgRating} (${ratingCount})`}
+                        </span>
+                      )}
                     </div>
                   </div>
 
