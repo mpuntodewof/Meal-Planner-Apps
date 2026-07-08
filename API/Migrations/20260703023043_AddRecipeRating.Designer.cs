@@ -4,6 +4,7 @@ using FoodFestAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodFestAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260703023043_AddRecipeRating")]
+    partial class AddRecipeRating
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,9 +232,12 @@ namespace FoodFestAPI.Migrations
                     b.Property<int>("MealPlanId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MealPlansId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("MealPlanId");
+                    b.HasIndex("MealPlansId");
 
                     b.ToTable("MealPlanDays");
                 });
@@ -558,9 +564,7 @@ namespace FoodFestAPI.Migrations
                 {
                     b.HasOne("FoodFestAPI.Models.MealPlans", "MealPlans")
                         .WithMany("MealPlanDays")
-                        .HasForeignKey("MealPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MealPlansId");
 
                     b.Navigation("MealPlans");
                 });

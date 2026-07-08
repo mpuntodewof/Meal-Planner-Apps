@@ -159,14 +159,32 @@ namespace FoodFestAPI.Controllers
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    if (request.ImageUrl == null)
-                    {
-                        _response.IsSuccess = false;
-                        _response.StatusCode = HttpStatusCode.BadRequest;
-                    }
+                    _response.IsSuccess = false;
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.ErrorMessages = new List<string>() { "Invalid request." };
+                    return StatusCode((int)_response.StatusCode, _response);
+                }
 
+                if (string.IsNullOrWhiteSpace(request.ImageUrl))
+                {
+                    _response.IsSuccess = false;
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.ErrorMessages = new List<string>() { "ImageUrl is required." };
+                    return StatusCode((int)_response.StatusCode, _response);
+                }
+
+                // ImageUrl may be either a plain http(s) URL (e.g. seeded recipes)
+                // or a base64-encoded image to upload to Cloudinary. Use the URL
+                // as-is when given one; otherwise decode + upload.
+                string imageUrl;
+                if (request.ImageUrl.StartsWith("http://") || request.ImageUrl.StartsWith("https://"))
+                {
+                    imageUrl = request.ImageUrl;
+                }
+                else
+                {
                     byte[] byteImg = Convert.FromBase64String(request.ImageUrl);
                     var stream = new MemoryStream(byteImg);
                     IFormFile fileResult = new FormFile(
@@ -177,70 +195,71 @@ namespace FoodFestAPI.Controllers
                         "fileName"
                     );
                     var imgResult = await _imgService.AddImageAsync(fileResult);
-
-                    Recipe recipe = new()
-                    {
-                        Name = request.Name,
-                        Description = request.Description,
-                        CookingTime = request.CookingTime,
-                        ServiceSize = request.ServiceSize,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        UserId = request.UserId,
-                        ImageUrl = imgResult.Url.ToString(),
-                        VideoUrl = request.VideoUrl,
-                        //CategoriesId = request.CategoriesId
-                    };
-
-                    _ctx.Recipes.Add(recipe);
-
-                    foreach (var reqIngredient in request.Ingredient)
-                    {
-                        Ingredient ingredientData = new()
-                        {
-                            Name = reqIngredient.Name,
-                            Unit = reqIngredient.Unit,
-                            Description = reqIngredient.Description,
-                            UpdatedAt = DateTime.UtcNow,
-                            CreatedAt = DateTime.UtcNow,
-                            Recipe = recipe,
-                        };
-                        // Also track on the nav collection so nutrition estimation
-                        // below can read the ingredients without a re-query.
-                        recipe.Ingredients.Add(ingredientData);
-                        _ctx.Ingredients.Add(ingredientData);
-                    }
-
-                    foreach (var insItem in request.Instructions)
-                    {
-                        Instructions instData = new Instructions()
-                        {
-                            StepNumber = insItem.StepNumber,
-                            Description = insItem.Description,
-                            Recipe = recipe,
-                        };
-                        _ctx.Instructions.Add(instData);
-                    }
-
-                    await _ctx.SaveChangesAsync();
-
-                    // Estimate + store per-serving nutrition. Never blocks the save:
-                    // failure leaves nutrition null. Adds ~1-2s to this admin-only call.
-                    await EstimateAndStoreNutritionAsync(recipe);
-
-                    _response.Result = recipe;
-                    _response.StatusCode = HttpStatusCode.OK;
-                    _response.IsSuccess = true;
+                    imageUrl = imgResult.Url.ToString();
                 }
+
+                Recipe recipe = new()
+                {
+                    Name = request.Name,
+                    Description = request.Description,
+                    CookingTime = request.CookingTime,
+                    ServiceSize = request.ServiceSize,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    UserId = request.UserId,
+                    ImageUrl = imageUrl,
+                    VideoUrl = request.VideoUrl,
+                    //CategoriesId = request.CategoriesId
+                };
+
+                _ctx.Recipes.Add(recipe);
+
+                foreach (var reqIngredient in request.Ingredient)
+                {
+                    Ingredient ingredientData = new()
+                    {
+                        Name = reqIngredient.Name,
+                        Unit = reqIngredient.Unit,
+                        Description = reqIngredient.Description,
+                        UpdatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTime.UtcNow,
+                        Recipe = recipe,
+                    };
+                    // Also track on the nav collection so nutrition estimation
+                    // below can read the ingredients without a re-query.
+                    recipe.Ingredients.Add(ingredientData);
+                    _ctx.Ingredients.Add(ingredientData);
+                }
+
+                foreach (var insItem in request.Instructions)
+                {
+                    Instructions instData = new Instructions()
+                    {
+                        StepNumber = insItem.StepNumber,
+                        Description = insItem.Description,
+                        Recipe = recipe,
+                    };
+                    _ctx.Instructions.Add(instData);
+                }
+
+                await _ctx.SaveChangesAsync();
+
+                // Estimate + store per-serving nutrition. Never blocks the save:
+                // failure leaves nutrition null. Adds ~1-2s to this admin-only call.
+                await EstimateAndStoreNutritionAsync(recipe);
+
+                _response.Result = recipe;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+                return StatusCode((int)_response.StatusCode, _response);
             }
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.ErrorMessages = new List<string>() { ex.ToString() };
+                return StatusCode((int)_response.StatusCode, _response);
             }
-
-            return _response;
         }
 
         [HttpPost("generate")]

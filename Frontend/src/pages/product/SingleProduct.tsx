@@ -11,6 +11,12 @@ import { Roles } from '../../interfaces/enum';
 import { RootState } from '../../redux/store/storeRedux';
 import ScheduleMealModal from '../../components/ScheduleMealModal';
 import toastNotify from '../../helper/toastNotify';
+import { Rate } from "rsuite";
+import {
+  useGetMyRatingQuery,
+  useGetRatingSummaryQuery,
+  useRateRecipeMutation,
+} from "../../api/ratingApi";
 
 function SingleProduct() {
   const { recipeId } = useParams();
@@ -23,6 +29,26 @@ function SingleProduct() {
   const userData: userModel = useSelector(
     (state: RootState) => state.userAuthStore
   );
+
+  const userId = userData?.id;
+  const numericRecipeId = Number(recipeId);
+
+  const { data: myRatingResp } = useGetMyRatingQuery(
+    { userId, recipeId: numericRecipeId },
+    { skip: !userId || !numericRecipeId }
+  );
+  const { data: summaryResp } = useGetRatingSummaryQuery(
+    numericRecipeId ? [numericRecipeId] : [],
+    { skip: !numericRecipeId }
+  );
+  const [rateRecipe] = useRateRecipeMutation();
+
+  const myStars = myRatingResp?.result?.stars ?? 0;
+  const ratingSummary = (summaryResp?.result?.$values ?? []).find(
+    (s: any) => s.recipeId === numericRecipeId
+  );
+  const avgRating = ratingSummary?.average ?? 0;
+  const ratingCount = ratingSummary?.count ?? 0;
 
   useEffect(() => {
     if (!isLoading) {
@@ -157,9 +183,32 @@ function SingleProduct() {
                       <span style={{ color: "var(--bm-faint)" }}>Servings</span><strong>{r.serviceSize || "—"}</strong>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", alignItems: "center" }}>
-                      {/* Static rating for now — wired to real ratings in the Meal Rating phase. */}
                       <span style={{ color: "var(--bm-faint)" }}>Rating</span>
-                      <span className="bm-stars" style={{ fontSize: 15 }} aria-label="Rating placeholder">★★★★★</span>
+                      {userId ? (
+                        <Rate
+                          value={myStars}
+                          max={5}
+                          size="sm"
+                          onChange={async (value: number) => {
+                            try {
+                              await rateRecipe({
+                                userId,
+                                recipeId: numericRecipeId,
+                                stars: value,
+                              }).unwrap();
+                            } catch {
+                              // swallow — RTK cache invalidation refetches the summary/my-rating
+                            }
+                          }}
+                        />
+                      ) : (
+                        <Rate value={avgRating} max={5} size="sm" readOnly />
+                      )}
+                      {ratingCount > 0 && (
+                        <span style={{ color: "var(--bm-faint)", fontSize: 13 }}>
+                          {`${avgRating} (${ratingCount})`}
+                        </span>
+                      )}
                     </div>
                   </div>
 

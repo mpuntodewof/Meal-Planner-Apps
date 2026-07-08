@@ -114,6 +114,31 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Apply any pending EF Core migrations on startup so a fresh database
+// (e.g. a recreated Docker volume) is provisioned automatically instead of
+// throwing "Table doesn't exist" 500s on the first request.
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = services.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+        logger.LogInformation("Database migrations applied successfully.");
+
+        // Seed sample recipe data so a fresh database is never empty.
+        // Idempotent: skips if recipes already exist.
+        var userMgr = services.GetRequiredService<UserManager<AppUser>>();
+        await DbSeeder.SeedRecipesAsync(db, userMgr, logger);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while applying database migrations.");
+        throw;
+    }
+}
+
 // Configure the HTTP request pipeline.
 // ⚠️  CORS MUST be first — before Swagger, auth, and everything else
 //     so that even error responses (4xx/5xx) carry the CORS headers.

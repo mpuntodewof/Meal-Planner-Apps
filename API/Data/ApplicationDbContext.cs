@@ -17,6 +17,7 @@ namespace FoodFestAPI.Data
         public DbSet<UserFavorite> UserFavorites { get; set; }
         public DbSet<MealPlans> MealPlans { get; set; }
         public DbSet<MealPlanDays> MealPlanDays { get; set; }
+        public DbSet<RecipeRating> RecipeRatings { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -30,6 +31,18 @@ namespace FoodFestAPI.Data
                 new Categories { ID = 5, Name = "Lunch" },
                 new Categories { ID = 6, Name = "Snack" }
             );
+
+            builder.Entity<RecipeRating>()
+                .HasIndex(r => new { r.UserId, r.RecipeId })
+                .IsUnique();
+
+            // MealPlanDays.MealPlanId is the real FK to MealPlans; without this the
+            // convention invents an unpopulated shadow FK (MealPlansId) and the
+            // MealPlanDays.MealPlans navigation never resolves. Bind it explicitly.
+            builder.Entity<MealPlanDays>()
+                .HasOne(d => d.MealPlans)
+                .WithMany(m => m.MealPlanDays)
+                .HasForeignKey(d => d.MealPlanId);
         }
     }
 }

@@ -46,6 +46,11 @@ namespace FoodFestAPI.Helpers
                 return null;
             }
 
+            var baseUrl = _config["OpenAI:BaseUrl"];
+            var models = ModelListParser.Parse(_config["OpenAI:Models"], _config["OpenAI:Model"]);
+            var referer = _config["OpenAI:Referer"];
+            var title = _config["OpenAI:Title"];
+
             try
             {
                 // Compact, structured description of the recipe for the model.
@@ -67,12 +72,6 @@ namespace FoodFestAPI.Helpers
                     }
                 );
 
-                ChatClient client = OpenAiClientFactory.CreateChatClient(
-                    apiKey,
-                    Model,
-                    _config["OpenAI:BaseUrl"]
-                );
-
                 List<ChatMessage> messages =
                 [
                     new SystemChatMessage(SystemPrompt),
@@ -85,36 +84,34 @@ namespace FoodFestAPI.Helpers
                     ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat(),
                 };
 
-                ChatCompletion completion = await client.CompleteChatAsync(messages, options);
-
-                var sb = new StringBuilder();
-                foreach (var part in completion.Content)
+                var runner = new ChatCompletionRunner(_log);
+                var result = await runner.RunAsync<NutritionResult>(models, async (model) =>
                 {
-                    if (!string.IsNullOrEmpty(part.Text))
-                        sb.Append(part.Text);
-                }
-                var raw = sb.ToString().Trim();
+                    ChatClient client = OpenAiClientFactory.CreateChatClient(apiKey, model, baseUrl, referer, title);
+                    ChatCompletion completion = await client.CompleteChatAsync(messages, options);
 
-                // Defensive: strip accidental code fences if present.
-                if (raw.StartsWith("```"))
-                {
-                    int firstBrace = raw.IndexOf('{');
-                    int lastBrace = raw.LastIndexOf('}');
-                    if (firstBrace >= 0 && lastBrace > firstBrace)
-                        raw = raw.Substring(firstBrace, lastBrace - firstBrace + 1);
-                }
+                    var sb = new StringBuilder();
+                    foreach (var part in completion.Content)
+                        if (!string.IsNullOrEmpty(part.Text)) sb.Append(part.Text);
+                    var raw = sb.ToString().Trim();
 
-                var result = JsonSerializer.Deserialize<NutritionResult>(
-                    raw,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                );
+                    if (raw.StartsWith("```"))
+                    {
+                        int firstBrace = raw.IndexOf('{');
+                        int lastBrace = raw.LastIndexOf('}');
+                        if (firstBrace >= 0 && lastBrace > firstBrace)
+                            raw = raw.Substring(firstBrace, lastBrace - firstBrace + 1);
+                    }
+
+                    return JsonSerializer.Deserialize<NutritionResult>(
+                        raw, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                });
 
                 if (result == null)
                 {
                     _log.LogWarning("Nutrition estimation returned an empty or malformed result.");
                     return null;
                 }
-
                 return result;
             }
             catch (Exception ex)
