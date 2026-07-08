@@ -16,6 +16,9 @@ public class ChatCompletionRunnerTests
     [InlineData(401, false)]
     [InlineData(403, false)]
     [InlineData(404, false)]
+    [InlineData(499, false)]
+    [InlineData(599, true)]
+    [InlineData(600, false)]
     public void IsRetryableStatus_ClassifiesCorrectly(int status, bool expected)
     {
         Assert.Equal(expected, ChatCompletionRunner.IsRetryableStatus(status));

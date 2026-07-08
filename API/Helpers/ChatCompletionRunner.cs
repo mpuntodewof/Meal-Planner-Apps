@@ -36,6 +36,9 @@ namespace FoodFestAPI.Helpers
 
         public async Task<T> RunAsync<T>(List<string> models, Func<string, Task<T>> invoke)
         {
+            if (models is null || models.Count == 0)
+                throw new ArgumentException("At least one model is required.", nameof(models));
+
             for (int i = 0; i < models.Count; i++)
             {
                 var model = models[i];
