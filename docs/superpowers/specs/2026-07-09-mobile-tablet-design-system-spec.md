@@ -398,6 +398,65 @@ A **hybrid** model, chosen deliberately per context.
 
 ---
 
+## 6.9 Data & content reference (use realistic content, not lorem ipsum)
+
+> Field names and shapes are taken from the live app's data models. Use realistic
+> sample content so the generated screens and Figma review are meaningful. Do **not**
+> use lorem ipsum for domain content.
+
+### Recipe (Recipe Card, Single Recipe)
+Fields: `name`, `description`, `cookingTime` (e.g. "35 min"), `serviceSize`
+(e.g. "4 servings"), `imageUrl`, `isFavorited`, and AI-estimated **per-serving**
+nutrition: `calories`, `proteinG`, `fatG`, `carbsG` (any may be `null` = "not yet
+analyzed" — show the estimated/absent state), plus `ingredients[]` and
+`instructions[]`.
+
+- **Ingredient:** `name`, `unit` (e.g. "2 cloves", "200 g"), optional `description`.
+- **Instruction:** ordered steps (paired with the Step-number component).
+- Sample recipes: *"Nasi Goreng Special"*, *"Grilled Salmon with Herbs"*,
+  *"Beef Rendang"*, *"Avocado Toast"*, *"Chicken Caesar Salad"*.
+- Sample quick-facts: **Time** 35 min · **Servings** 4 · **Calories** 520 kcal.
+- Sample macros (per serving): **Protein** 28 g · **Fat** 18 g · **Carbs** 46 g.
+
+### Meal Plan (Planner, Schedule Meal)
+- Meal types (slots): **Breakfast · Lunch · Dinner · Snack**.
+- A plan entry has `planName`, `mealType`, `startDate`, `endDate`, a `recipe`, and
+  the day(s) it applies to. Planner cells reference recipes by name/thumbnail.
+- Week model: 7 days (Mon–Sun), each with the four meal slots above.
+
+### Shopping List (generated from the plan for a date range)
+- Items are grouped and de-duplicated by ingredient `name`, each with its `unit(s)`
+  (e.g. "Eggs — 6", "Olive oil — 4 tbsp", "Chicken breast — 800 g").
+- Suggested category groups for headers: **Produce, Meat & Seafood, Dairy & Eggs,
+  Pantry, Spices, Other.**
+- Progress example: "7 of 18 items".
+
+### Dashboard (KPIs + charts)
+- **KPI tiles:** Total Meals Planned (`totalMealsPlanned`), Unique Recipes
+  (`uniqueRecipes`), Variety Score (`varietyScore`, band **Low / Balanced / High**),
+  Avg Rating (`avgRating` + `ratingCount`), Avg Calories (`avgCalories`), Avg macros
+  (`avgProteinG` / `avgFatG` / `avgCarbsG`).
+- **Weekly stacked bar** (`weekly[]`): per week `weekLabel`, and counts for
+  `breakfast / lunch / dinner / snack / other`, plus `totalMeals`, `avgCalories`.
+- **Category donut** (`categoryMix[]`): `{ name, count }` — e.g. Indonesian 12,
+  Salads 6, Grilled 5, Dessert 3.
+- **Top recipes horizontal bar** (`topRecipes[]`): `{ name, count }`.
+- **Insight line** (`insightLine`): a short sentence, e.g. *"You planned 22% more
+  dinners this week than last."*
+- **Empty state** driven by `hasData: false` — show the "no activity yet" empty state.
+- Admin variant adds: Weekly Active Users, Recipes Created, New Users.
+
+### User / Profile
+- Fields: `name`, `email`, `role` (**admin** / **user** — show an "Admin" chip for
+  admins, which reveals Create Recipe).
+- Sample: *"Henoch Hernanda — henoch@example.com — User"*.
+
+### Auth
+- Login: email + password. Register: name + email + password (+ confirm). Forgot:
+  email. Reset: new password + confirm. Realistic labels, not lorem.
+
+---
+
 ## 7. Accessibility & touch
 
 - **Touch targets:** ≥ 44×44px for all interactive elements on mobile/tablet.
@@ -448,7 +507,8 @@ A **hybrid** model, chosen deliberately per context.
 
 - [ ] Design tokens defined as reusable styles/variables (§2), light theme only.
 - [ ] Component library covering every item in §5, each with states + responsive behavior.
-- [ ] All 8 screens (§6) at **mobile / tablet / desktop**.
+- [ ] All 8 screens (§6) at **mobile / tablet / desktop**, using realistic domain
+      content from §6.9 (no lorem ipsum).
 - [ ] Bottom tab bar (mobile) + sidebar rail (tablet) + top nav (desktop) + overlay.
 - [ ] Navigable Figma prototype linking the core flows
       (Recipes → Single Recipe → Add to Plan → Planner → Shopping List; plus Dashboard,
