@@ -19,6 +19,12 @@ const recipeApi = createApi({
       }),
       providesTags: ["Recipes"],
     }),
+    getRecipesByUserId: builder.query({
+      query: (userId) => ({
+        url: `recipe/by-user/${userId}`,
+      }),
+      providesTags: ["Recipes"],
+    }),
     createRecipe: builder.mutation({
       query: (data) => ({
         url: "recipe",
@@ -62,6 +68,7 @@ const recipeApi = createApi({
 export const {
   useGetRecipesQuery,
   useGetRecipeByIdQuery,
+  useGetRecipesByUserIdQuery,
   useCreateRecipeMutation,
   useUpdateRecipeMutation,
   useDeleteRecipeMutation,
