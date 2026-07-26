@@ -118,6 +118,23 @@ function ProductCatalog() {
 		}
 	}
 
+	// Build a windowed list of page items around the current page. Always shows
+	// first and last page; inserts "…" ellipsis markers where pages are skipped,
+	// so the control never overflows no matter how many pages there are.
+	const getPageItems = (current: number, total: number): (number | "…")[] => {
+		if (total <= 7) {
+			return Array.from({ length: total }, (_, i) => i + 1);
+		}
+		const items: (number | "…")[] = [1];
+		const start = Math.max(2, current - 1);
+		const end = Math.min(total - 1, current + 1);
+		if (start > 2) items.push("…");
+		for (let p = start; p <= end; p++) items.push(p);
+		if (end < total - 1) items.push("…");
+		items.push(total);
+		return items;
+	};
+
 	return (
 		<>
 			{!isLoading && !isFetching ? (
@@ -181,10 +198,59 @@ function ProductCatalog() {
 									<div className="row">
 										<div className="col-lg-12 text-center">
 											<div className="pagination-wrap">
-												<ul style={{ listStyle: "none", display: "flex", gap: 12, justifyContent: "center", alignItems: "center", padding: 0 }}>
-													<li><a style={{ color: "var(--bm-muted)", cursor: "pointer" }} onClick={() => handlePageChange(pageNumber - 1)}>‹ Previous</a></li>
-													<li><span className="bm-btn" style={{ padding: "4px 12px" }}>{pageNumber}</span> <span style={{ color: "var(--bm-faint)" }}>of {totalPages}</span></li>
-													<li><a style={{ color: "var(--bm-muted)", cursor: "pointer" }} onClick={() => handlePageChange(pageNumber + 1)}>Next ›</a></li>
+												<ul style={{ listStyle: "none", display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", alignItems: "center", padding: 0 }}>
+													<li>
+														<a
+															style={{
+																color: pageNumber <= 1 ? "var(--bm-faint)" : "var(--bm-muted)",
+																cursor: pageNumber <= 1 ? "default" : "pointer",
+																pointerEvents: pageNumber <= 1 ? "none" : "auto",
+																padding: "4px 10px",
+															}}
+															onClick={() => handlePageChange(pageNumber - 1)}
+														>
+															‹ Previous
+														</a>
+													</li>
+
+													{getPageItems(pageNumber, totalPages).map((item, idx) =>
+														item === "…" ? (
+															<li key={`ellipsis-${idx}`}>
+																<span style={{ color: "var(--bm-faint)", padding: "4px 6px" }}>…</span>
+															</li>
+														) : (
+															<li key={item}>
+																<a
+																	onClick={() => handlePageChange(item)}
+																	aria-current={item === pageNumber ? "page" : undefined}
+																	className={item === pageNumber ? "bm-btn" : ""}
+																	style={{
+																		cursor: "pointer",
+																		padding: "4px 12px",
+																		borderRadius: 6,
+																		color: item === pageNumber ? undefined : "var(--bm-muted)",
+																		fontWeight: item === pageNumber ? 700 : 400,
+																	}}
+																>
+																	{item}
+																</a>
+															</li>
+														)
+													)}
+
+													<li>
+														<a
+															style={{
+																color: pageNumber >= totalPages ? "var(--bm-faint)" : "var(--bm-muted)",
+																cursor: pageNumber >= totalPages ? "default" : "pointer",
+																pointerEvents: pageNumber >= totalPages ? "none" : "auto",
+																padding: "4px 10px",
+															}}
+															onClick={() => handlePageChange(pageNumber + 1)}
+														>
+															Next ›
+														</a>
+													</li>
 												</ul>
 											</div>
 										</div>
