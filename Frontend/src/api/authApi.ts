@@ -45,9 +45,19 @@ const authApi = createApi({
                 },
                 body: resetData
             })
+        }),
+        changePassword: builder.mutation({
+            query: (changeData) => ({
+                url: "auth/change-password",
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body: changeData
+            })
         })
     }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useForgotPasswordMutation, useResetPasswordMutation } = authApi;
+export const { useRegisterMutation, useLoginMutation, useForgotPasswordMutation, useResetPasswordMutation, useChangePasswordMutation } = authApi;
 export default authApi;

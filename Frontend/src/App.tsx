@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setLoggedInUser } from './redux/reducerAction/userAuthSlice';
 
@@ -14,7 +14,6 @@ import userModel from './interfaces/userModel';
 import ProductCatalog from './pages/product/ProductCatalog';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
-import UserProfile from './pages/auth/UserProfile';
 import MealPlanner from './pages/mealPlan/MealPlanner';
 import News from './pages/news/News';
 import NewsArticle from './pages/news/NewsArticle';
@@ -61,7 +60,7 @@ function App() {
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/resetPassword" element={<ResetPassword />} />
 
-          <Route path="/userProfile/:userId" element={<UserProfile />} />
+          <Route path="/userProfile/:userId" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       {/* </> */}
     </div>
