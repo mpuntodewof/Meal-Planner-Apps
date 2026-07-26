@@ -1,9 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiBase } from "./apiConfig";
 
 const shoppingListApi = createApi({
   reducerPath: "shoppingListApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5128/api/",
+    baseUrl: apiBase("/"),
   }),
   tagTypes: ["ShoppingList"],
   endpoints: (builder) => ({

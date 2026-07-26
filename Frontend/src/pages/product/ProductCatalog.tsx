@@ -56,35 +56,23 @@ function ProductCatalog() {
 			)
 	}), [favorites]);
 
-	// post data when page refreshed
-	useEffect(() => {
-		const postData = async () => {
-			try {
-				const result = addRemoveFavorite({ data: favData }).unwrap();
-				console.log('Success:', result);
-			} catch (error) {
-				console.error('Failed:', error);
-			}
+	// Persist favorite changes on mount, and again every 3 minutes so long-lived
+	// sessions don't lose local toggles. `.unwrap()` must be awaited for the
+	// try/catch to actually observe a rejection.
+	const persistFavorites = async () => {
+		try {
+			await addRemoveFavorite({ data: favData }).unwrap();
+		} catch (error) {
+			console.error("Failed to persist favorites:", error);
 		}
+	};
 
-		postData();
+	useEffect(() => {
+		persistFavorites();
 	}, [addRemoveFavorite, favData]);
 
-	// console.log({ favorites, data });
-
-	// Insert favRecipe data with time interval
 	useEffect(() => {
-		const dataInterval = () => {
-			try {
-				const result = addRemoveFavorite({ data: favData }).unwrap();
-				console.log('Success:', result);
-			} catch (error) {
-				console.error('Failed:', error);
-			}
-		};
-
-		const postInterval = setInterval(dataInterval, 180000);
-
+		const postInterval = setInterval(persistFavorites, 180000);
 		return () => clearInterval(postInterval);
 	}, [favData, addRemoveFavorite]);
 
@@ -108,13 +96,7 @@ function ProductCatalog() {
 	const handlePageChange = (newPage: any) => {
 		if (newPage >= 1 && newPage <= totalPages) {
 			setPageNumber(newPage);
-		}
-
-		try {
-			const result = addRemoveFavorite({ data: favData }).unwrap();
-			console.log('Success:', result);
-		} catch (error) {
-			console.error('Failed:', error);
+			persistFavorites();
 		}
 	}
 
