@@ -26,7 +26,7 @@ interface Props {
 
 const OverviewTab: React.FC<Props> = ({ userId, role }) => {
   const navigate = useNavigate();
-  const isAdmin = role === Roles.ADMIN;
+  const isAdmin = (role ?? "").toLowerCase() === Roles.ADMIN;
   const [view, setView] = useState<"user" | "admin">("user");
 
   const userQ = useGetUserDashboardQuery({ userId, weeks: 6 }, { skip: view !== "user" || !userId });
