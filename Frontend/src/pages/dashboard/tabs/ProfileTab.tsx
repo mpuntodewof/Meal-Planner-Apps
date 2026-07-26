@@ -82,30 +82,67 @@ const ProfileTab: React.FC<Props> = ({ userId }) => {
     <div className="ds-card">
       <h3>Personal info</h3>
       <div className="sub">Update your account details</div>
-      <img className="ds-avatar" src={imgUrl || avatarImg} alt="avatar" />
-      <form className="ds-form" onSubmit={handleSubmit} encType="multipart/form-data">
-        <div className="ds-row">
-          <input type="text" placeholder="Name" name="name" value={userInputs.name} onChange={handleUserInput} />
-          <input type="email" placeholder="Email" name="email" value={userInputs.email} onChange={handleUserInput} />
-        </div>
-        <div className="ds-row">
-          <input type="text" placeholder="City" name="city" value={userInputs.city} onChange={handleUserInput} />
-          <input type="text" placeholder="Country" name="country" value={userInputs.country} onChange={handleUserInput} />
-        </div>
-        <input type="text" placeholder="Social Media" name="socialMedia" value={userInputs.socialMedia} onChange={handleUserInput} />
-        <input type="tel" placeholder="Phone Number" name="phoneNumber" value={userInputs.phoneNumber} onChange={handleUserInput} />
-        <div className="ds-row">
-          <input type="file" onChange={handleFileChange} />
-          <select name="gender" value={userInputs.gender} onChange={handleUserInput}>
-            <option value="">Select gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-        <button className="ds-submit" type="submit" disabled={loading}>
-          {loading ? "Updating…" : "Update"}
-        </button>
-      </form>
+      <div className="ds-profile-layout">
+        <aside className="ds-profile-aside">
+          <img className="ds-avatar" src={imgUrl || avatarImg} alt="avatar" />
+        </aside>
+        <form className="ds-form ds-form-wide" onSubmit={handleSubmit} encType="multipart/form-data">
+          <div className="ds-row">
+            <div className="ds-field">
+              <label htmlFor="pf-name">Name</label>
+              <input id="pf-name" type="text" placeholder="Name" name="name" value={userInputs.name} onChange={handleUserInput} />
+            </div>
+            <div className="ds-field">
+              <label htmlFor="pf-email">Email</label>
+              <input id="pf-email" type="email" placeholder="Email" name="email" value={userInputs.email} onChange={handleUserInput} />
+            </div>
+          </div>
+          <div className="ds-row">
+            <div className="ds-field">
+              <label htmlFor="pf-city">City</label>
+              <input id="pf-city" type="text" placeholder="City" name="city" value={userInputs.city} onChange={handleUserInput} />
+            </div>
+            <div className="ds-field">
+              <label htmlFor="pf-country">Country</label>
+              <input id="pf-country" type="text" placeholder="Country" name="country" value={userInputs.country} onChange={handleUserInput} />
+            </div>
+          </div>
+          <div className="ds-field">
+            <label htmlFor="pf-social">Social Media</label>
+            <input id="pf-social" type="text" placeholder="Social Media" name="socialMedia" value={userInputs.socialMedia} onChange={handleUserInput} />
+          </div>
+          <div className="ds-field">
+            <label htmlFor="pf-phone">Phone Number</label>
+            <input id="pf-phone" type="tel" placeholder="Phone Number" name="phoneNumber" value={userInputs.phoneNumber} onChange={handleUserInput} />
+          </div>
+          <div className="ds-row">
+            <div className="ds-field">
+              <label htmlFor="pf-photo">
+                <i className="fas fa-image" aria-hidden="true"></i> Profile photo
+              </label>
+              <div className="ds-file-row">
+                <input id="pf-photo" type="file" accept="image/png, image/jpeg" onChange={handleFileChange} />
+                {imgStore && (
+                  <span className="ds-file-ok">
+                    <i className="fas fa-check-circle" aria-hidden="true"></i> Image ready — click Update to save
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="ds-field">
+              <label htmlFor="pf-gender">Gender</label>
+              <select id="pf-gender" name="gender" value={userInputs.gender} onChange={handleUserInput}>
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+          </div>
+          <button className="ds-submit" type="submit" disabled={loading}>
+            {loading ? "Updating…" : "Update"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

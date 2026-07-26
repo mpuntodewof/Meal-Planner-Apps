@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/store/storeRedux";
 import userModel from "../../interfaces/userModel";
-import Navbar from "../../components/sub-comp/Navbar";
 import Footer from "../../components/Footer";
 import DashboardTabs, { TabDef, TabKey } from "./components/DashboardTabs";
 import OverviewTab from "./tabs/OverviewTab";
@@ -12,6 +11,8 @@ import MyRecipesTab from "./tabs/MyRecipesTab";
 import FavoritesTab from "./tabs/FavoritesTab";
 import SecurityTab from "./tabs/SecurityTab";
 import "./dashboard.css";
+
+const logoImg = require("../../img/food-re-logo.png");
 
 const TABS: TabDef[] = [
   { key: "overview", label: "Overview" },
@@ -44,14 +45,35 @@ const Dashboard: React.FC = () => {
   const [active, setActive] = useState<TabKey>("overview");
   const mast = MASTHEAD[active];
 
+  // Go back to the previous page if there's history, otherwise fall back home.
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/");
+  };
+
   return (
     <>
-      <Navbar />
       <div className="dashboard-root">
-        <header className="ds-masthead">
-          <div className="ds-kicker">Meal Planner · Account</div>
-          <h1 className="ds-title">{mast.title}</h1>
-          <p className="ds-lead">{mast.lead}</p>
+        <div className="ds-controls">
+          <button className="ds-btn" onClick={goBack} type="button" aria-label="Go back">
+            <i className="fas fa-arrow-left" aria-hidden="true"></i> Back
+          </button>
+        </div>
+
+        <header className="ds-masthead ds-masthead-row">
+          <div className="ds-masthead-text">
+            <div className="ds-kicker">Meal Planner · Account</div>
+            <h1 className="ds-title">{mast.title}</h1>
+            <p className="ds-lead">{mast.lead}</p>
+          </div>
+          <button
+            className="ds-home-logo"
+            onClick={() => navigate("/")}
+            type="button"
+            aria-label="Go to home page"
+          >
+            <img src={logoImg} alt="Home" />
+          </button>
         </header>
 
         {loggedOut && (

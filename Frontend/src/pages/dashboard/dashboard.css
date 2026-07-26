@@ -68,6 +68,17 @@
 .ds-note { font-size:13px; color:var(--muted); margin-top:14px; padding:12px 16px; border-left:3px solid var(--s3); background:color-mix(in srgb, var(--s3) 8%, transparent); border-radius:0 8px 8px 0; line-height:1.5; }
 .ds-note b { color:var(--ink); }
 
+/* Masthead row: title block on the left, clickable Home logo pulled right */
+.ds-masthead-row { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.ds-masthead-text { min-width:0; }
+.ds-home-logo { flex-shrink:0; background:none; border:0; padding:0; cursor:pointer; line-height:0; border-radius:50%; transition:transform .15s ease, opacity .15s ease; }
+.ds-home-logo img { height:64px; width:auto; display:block; }
+.ds-home-logo:hover { transform:scale(1.05); opacity:.9; }
+@media (max-width:560px) {
+  .ds-masthead-row { flex-direction:column-reverse; align-items:flex-start; gap:12px; }
+  .ds-home-logo { align-self:flex-end; }
+}
+
 /* Controls row */
 .ds-controls { display:flex; align-items:center; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
 .ds-btn { display:inline-flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--border); color:var(--ink-2); font-family:inherit; font-size:12.5px; font-weight:600; padding:8px 16px; border-radius:999px; cursor:pointer; transition:background .15s ease, color .15s ease; }
@@ -102,14 +113,11 @@
   color: var(--ink);
   border-bottom-color: var(--s1);
 }
-.ds-tab:focus-visible {
-  outline: 2px solid var(--s1);
-  outline-offset: 2px;
-}
 
 /* --- Merged dashboard: forms --- */
 .ds-form { display: flex; flex-direction: column; gap: 14px; max-width: 640px; }
-.ds-form label { font-weight: 600; font-size: 14px; margin-bottom: 4px; display: block; }
+.ds-form.ds-form-wide { max-width: none; flex: 1; }
+.ds-form label { font-weight: 600; font-size: 14px; margin-bottom: 4px; display: block; color: var(--ink-2); }
 .ds-form input,
 .ds-form select {
   width: 100%;
@@ -122,10 +130,24 @@
 }
 .ds-form .ds-row { display: flex; gap: 12px; flex-wrap: wrap; }
 .ds-form .ds-row > * { flex: 1 1 220px; }
+.ds-field { display: flex; flex-direction: column; }
+
+/* Profile tab: avatar column on the left, form fills the rest (no blank gap) */
+.ds-profile-layout { display: flex; gap: 32px; align-items: flex-start; margin-top: 8px; flex-wrap: wrap; }
+.ds-profile-aside { flex: 0 0 auto; display: flex; justify-content: center; width: 160px; }
 .ds-avatar {
   width: 140px; height: 140px; border-radius: 50%;
-  object-fit: cover; display: block; margin: 0 auto 20px;
+  object-fit: cover; display: block;
+  border: 1px solid var(--border);
 }
+@media (max-width: 640px) {
+  .ds-profile-aside { width: 100%; margin-bottom: 8px; }
+}
+
+/* File upload row: input + inline "ready" confirmation with icon */
+.ds-file-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ds-file-row input[type="file"] { flex: 0 1 auto; }
+.ds-file-ok { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--s2); }
 .ds-submit {
   align-self: flex-start;
   padding: 10px 22px; border-radius: 999px; border: 0;
@@ -147,4 +169,39 @@
   align-self: flex-start; margin-top: auto;
   padding: 6px 14px; border-radius: 999px;
   background: var(--s1); color: #fff; font-weight: 600; text-decoration: none; cursor: pointer;
+}
+
+/* --- Focus: soft brand ring, no default black outline, across all dashboard controls --- */
+.dashboard-root button:focus,
+.dashboard-root a:focus,
+.dashboard-root input:focus,
+.dashboard-root select:focus {
+  outline: none;
+}
+.dashboard-root button:focus-visible,
+.dashboard-root a:focus-visible,
+.dashboard-root input:focus-visible,
+.dashboard-root select:focus-visible {
+  outline: none;
+  border-radius: 8px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s1) 45%, transparent);
+}
+/* Pill-shaped controls keep their round focus ring */
+.dashboard-root .ds-btn:focus-visible,
+.dashboard-root .ds-submit:focus-visible,
+.dashboard-root .roletoggle button:focus-visible,
+.dashboard-root .ds-recipe-link:focus-visible,
+.dashboard-root .ds-empty-cta:focus-visible {
+  border-radius: 999px;
+}
+/* Tabs: underline style, so ring hugs the tab without a pill */
+.dashboard-root .ds-tab:focus-visible {
+  outline: none;
+  border-radius: 6px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s1) 45%, transparent);
+}
+/* Home logo keeps its round ring */
+.dashboard-root .ds-home-logo:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s1) 45%, transparent);
 }
