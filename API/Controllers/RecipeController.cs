@@ -154,6 +154,31 @@ namespace FoodFestAPI.Controllers
             return Ok(_response);
         }
 
+        [HttpGet("by-user/{userId}")]
+        public async Task<ActionResult> GetRecipesByUserId(string userId)
+        {
+            try
+            {
+                var result = await _ctx
+                    .Recipes.Include(i => i.Ingredients)
+                    .Include(i => i.Instructions)
+                    .Where(r => r.UserId == userId)
+                    .ToListAsync();
+
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+                _response.Result = result;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.ErrorMessages = new List<string>() { ex.Message };
+                return StatusCode(500, _response);
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<ApiResponse>> CreateRecipe([FromBody] RecipeCreate request)
         {
