@@ -1,0 +1,57 @@
+name: CI
+
+# Runs on every push and pull request to master. Two independent jobs:
+# the .NET API (build + xUnit tests) and the React frontend (type-check + build).
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  backend:
+    name: Backend — build & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore API.Tests/API.Tests.csproj
+
+      - name: Build
+        run: dotnet build API/FoodFestAPI.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test API.Tests/API.Tests.csproj --configuration Release --no-restore --verbosity normal
+
+  frontend:
+    name: Frontend — type-check & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build (tsc + bundle)
+        run: npm run build
+        env:
+          # CRA treats warnings as errors when CI=true. The repo has known,
+          # pre-existing lint warnings unrelated to correctness, so keep the
+          # build green by not failing on warnings.
+          CI: false
