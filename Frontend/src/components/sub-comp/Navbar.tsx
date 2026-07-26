@@ -122,10 +122,7 @@ function Navbar() {
                                   <a onClick={() => navigate("/mealPlan")}>Meal Plan</a>
                                 </li>
                                 <li>
-                                  <a onClick={() => navigate("/dashboard")}>Dashboard</a>
-                                </li>
-                                <li>
-                                  <a onClick={() => navigate(`/userProfile/${userData.id}`)}>User Profile</a>
+                                  <a onClick={() => navigate("/dashboard")}>My Account</a>
                                 </li>
                                 <li>
                                   <a className="btn-area btn-outlined rounded-pill" onClick={handleLogout}>Logout</a>
@@ -184,8 +181,7 @@ function Navbar() {
               <>
                 <a onClick={() => go("/addProduct")}>Create Recipe</a>
                 <a onClick={() => go("/mealPlan")}>Meal Plan</a>
-                <a onClick={() => go("/dashboard")}>Dashboard</a>
-                <a onClick={() => go(`/userProfile/${userData.id}`)}>User Profile</a>
+                <a onClick={() => go("/dashboard")}>My Account</a>
                 <a onClick={() => { setMenuOpen(false); handleLogout(); }}>Logout</a>
               </>
             ) : (
